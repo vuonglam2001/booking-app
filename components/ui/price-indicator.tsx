@@ -1,42 +1,30 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import { ThemeColors } from '@/constants/theme';
-import { Typography } from '@/constants/typography';
+import { FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
-import type { PriceLevel } from '@/types';
+import { formatPriceRange } from '@/utils/format';
 
 interface PriceIndicatorProps {
-  level: PriceLevel;
+  priceRange: { min: number; max: number };
 }
 
-const MAX_LEVEL = 4;
-
-export function PriceIndicator({ level }: PriceIndicatorProps) {
+export function PriceIndicator({ priceRange }: PriceIndicatorProps) {
   const { mode } = useAppMode();
   const colors = ThemeColors[mode];
 
   return (
-    <View style={styles.container}>
-      {Array.from({ length: MAX_LEVEL }, (_, i) => (
-        <Text
-          key={i}
-          style={[
-            Typography.caption,
-            {
-              color: i < level ? colors.text : colors.textTertiary,
-              fontWeight: '600',
-            },
-          ]}>
-          $
-        </Text>
-      ))}
-    </View>
+    <Text style={[styles.text, { color: colors.textSecondary }]}>
+      {formatPriceRange(priceRange.min, priceRange.max)}
+    </Text>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
+  text: {
+    fontFamily: FontFamily.monoRegular,
+    fontSize: 11,
+    lineHeight: 16,
   },
 });

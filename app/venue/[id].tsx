@@ -124,7 +124,7 @@ export default function VenueDetailScreen() {
           </Text>
           <View style={styles.metaRow}>
             <RatingBadge rating={venue.rating} />
-            <PriceIndicator level={venue.priceLevel} />
+            <PriceIndicator priceRange={venue.priceRange} />
             <Text style={[Typography.caption, { color: colors.textSecondary }]}>
               ({venue.reviewCount} reviews)
             </Text>

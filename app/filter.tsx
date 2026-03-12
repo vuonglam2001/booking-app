@@ -412,28 +412,30 @@ export default function FilterScreen() {
             Cost per person (VND)
           </Text>
           <View style={styles.priceRow}>
-            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: colors.inputBackground }]}>
+            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
+              <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>Min</Text>
               <TextInput
-                style={[Typography.body, { color: colors.text, flex: 1 }]}
+                style={[styles.priceValue, { color: colors.text }]}
                 value={formatVND(parseInt(priceMin || '0', 10))}
                 onChangeText={(t) => setPriceMin(t.replace(/[^0-9]/g, ''))}
                 keyboardType="numeric"
                 placeholder="0"
                 placeholderTextColor={colors.inputPlaceholder}
               />
-              <Text style={[Typography.caption, { color: colors.textTertiary }]}>VND</Text>
+              <Text style={[styles.priceSuffix, { color: colors.primary }]}>₫</Text>
             </View>
-            <Text style={[Typography.body, { color: colors.textSecondary }]}>—</Text>
-            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: colors.inputBackground }]}>
+            <Text style={[Typography.body, { color: colors.textTertiary }]}>—</Text>
+            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
+              <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>Max</Text>
               <TextInput
-                style={[Typography.body, { color: colors.text, flex: 1 }]}
+                style={[styles.priceValue, { color: colors.text }]}
                 value={formatVND(parseInt(priceMax || '0', 10))}
                 onChangeText={(t) => setPriceMax(t.replace(/[^0-9]/g, ''))}
                 keyboardType="numeric"
                 placeholder="3,000,000"
                 placeholderTextColor={colors.inputPlaceholder}
               />
-              <Text style={[Typography.caption, { color: colors.textTertiary }]}>VND</Text>
+              <Text style={[styles.priceSuffix, { color: colors.primary }]}>₫</Text>
             </View>
           </View>
         </View>
@@ -586,13 +588,30 @@ const styles = StyleSheet.create({
   },
   priceInput: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1.5,
     paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm + 2,
-    gap: Spacing.sm,
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.sm + 2,
+  },
+  priceLabel: {
+    fontFamily: FontFamily.sansRegular,
+    fontSize: 10,
+    lineHeight: 14,
+    marginBottom: 2,
+  },
+  priceValue: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 16,
+    lineHeight: 22,
+    padding: 0,
+  },
+  priceSuffix: {
+    position: 'absolute',
+    right: Spacing.md,
+    bottom: Spacing.sm + 4,
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 14,
   },
   bottomBar: {
     position: 'absolute',

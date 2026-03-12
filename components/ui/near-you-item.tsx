@@ -6,14 +6,13 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { formatPriceRange } from '@/utils/format';
 import type { Venue } from '@/types';
 
 interface NearYouItemProps {
   venue: Venue;
   onPress: () => void;
 }
-
-const PRICE_LABELS = ['', '$', '$$', '$$$', '$$$$'];
 
 export function NearYouItem({ venue, onPress }: NearYouItemProps) {
   const { mode } = useAppMode();
@@ -45,7 +44,7 @@ export function NearYouItem({ venue, onPress }: NearYouItemProps) {
         <Text
           style={[styles.subtitle, { color: colors.textSecondary }]}
           numberOfLines={1}>
-          {displayCuisine} · {PRICE_LABELS[venue.priceLevel]} · {distance} km
+          {displayCuisine} · {formatPriceRange(venue.priceRange.min, venue.priceRange.max)} · {distance} km
         </Text>
         <View style={styles.ratingRow}>
           <MaterialIcons name="star-outline" size={14} color={colors.primary} />

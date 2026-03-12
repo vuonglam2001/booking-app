@@ -65,7 +65,7 @@ export function VenueCard({ venue, onPress, width = 220 }: VenueCardProps) {
         )}
         <View style={styles.footer}>
           <RatingBadge rating={venue.rating} />
-          <PriceIndicator level={venue.priceLevel} />
+          <PriceIndicator priceRange={venue.priceRange} />
         </View>
       </View>
     </AnimatedPressable>

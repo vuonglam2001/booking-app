@@ -62,7 +62,7 @@ export function VenueListItem({ venue, onPress }: VenueListItemProps) {
         </Text>
         <View style={styles.metaRow}>
           <RatingBadge rating={venue.rating} />
-          <PriceIndicator level={venue.priceLevel} />
+          <PriceIndicator priceRange={venue.priceRange} />
           {venue.tags.length > 0 && (
             <Text
               style={[Typography.caption, { color: colors.textTertiary, flexShrink: 1 }]}

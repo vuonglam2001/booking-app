@@ -28,3 +28,21 @@ export function formatTime(time: string): string {
 export function formatPriceLevel(level: PriceLevel): string {
   return '$'.repeat(level);
 }
+
+/** Compact VND format: 150000 → "150K", 1200000 → "1.2M" */
+export function formatVNDCompact(value: number): string {
+  if (value >= 1000000) {
+    const m = value / 1000000;
+    return m % 1 === 0 ? `${m}M` : `${parseFloat(m.toFixed(1))}M`;
+  }
+  if (value >= 1000) {
+    const k = value / 1000;
+    return k % 1 === 0 ? `${k}K` : `${Math.round(k)}K`;
+  }
+  return value.toString();
+}
+
+/** Format a price range as "150K - 350K" */
+export function formatPriceRange(min: number, max: number): string {
+  return `${formatVNDCompact(min)} - ${formatVNDCompact(max)}`;
+}

@@ -9,6 +9,7 @@ import Animated, {
 
 import { Spacing } from '@/constants/spacing';
 import { FontFamily } from '@/constants/typography';
+import { formatPriceRange } from '@/utils/format';
 import type { Venue } from '@/types';
 
 interface TrendingCardProps {
@@ -18,8 +19,6 @@ interface TrendingCardProps {
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-const PRICE_LABELS = ['', '$', '$$', '$$$', '$$$$'];
 
 export function TrendingCard({ venue, onPress, width = 200 }: TrendingCardProps) {
   const scale = useSharedValue(1);
@@ -66,7 +65,7 @@ export function TrendingCard({ venue, onPress, width = 200 }: TrendingCardProps)
           </Text>
           <Text style={styles.dot}>·</Text>
           <Text style={styles.metaText}>
-            {PRICE_LABELS[venue.priceLevel]}
+            {formatPriceRange(venue.priceRange.min, venue.priceRange.max)}
           </Text>
         </View>
       </View>
