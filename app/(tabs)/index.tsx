@@ -13,11 +13,13 @@ import { Carousel } from '@/components/ui/carousel';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { getVenuesByMode } from '@/data';
 import type { Venue } from '@/types';
 
 export default function HomeScreen() {
   const { mode, setMode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
   const [category, setCategory] = useState<CategoryKey>(
     mode === 'nightlife' ? 'nightlife' : 'dining'
@@ -26,7 +28,7 @@ export default function HomeScreen() {
   const handleCategoryChange = (key: CategoryKey) => {
     setCategory(key);
     // Switch app mode when selecting dining vs nightlife
-    if (key === 'dining' || key === 'cafes') {
+    if (key === 'dining') {
       setMode('dining');
     } else {
       setMode('nightlife');
@@ -35,16 +37,7 @@ export default function HomeScreen() {
 
   const venues = useMemo(() => getVenuesByMode(mode), [mode]);
 
-  // Filter venues based on category subcategory
-  const filteredVenues = useMemo(() => {
-    if (category === 'bars') {
-      return venues.filter((v) => v.type === 'bar' || v.type === 'lounge');
-    }
-    if (category === 'cafes') {
-      return venues.filter((v) => v.type === 'cafe');
-    }
-    return venues;
-  }, [venues, category]);
+  const filteredVenues = useMemo(() => venues, [venues]);
 
   const trending = useMemo(
     () => [...filteredVenues].sort((a, b) => b.bookingCount - a.bookingCount).slice(0, 8),
@@ -58,11 +51,11 @@ export default function HomeScreen() {
 
   const searchPlaceholder =
     mode === 'nightlife'
-      ? 'Find a place for tonight...'
-      : 'Find a restaurant nearby...';
+      ? strings.home.searchPlaceholderNightlife
+      : strings.home.searchPlaceholder;
 
   const trendingTitle =
-    mode === 'nightlife' ? 'Trending Tonight' : 'Trending Now';
+    mode === 'nightlife' ? strings.home.trendingNightlife : strings.home.trending;
 
   const renderTrendingCard = (item: Venue) => (
     <TrendingCard
@@ -109,7 +102,7 @@ export default function HomeScreen() {
         />
 
         <SectionHeader
-          title="Near You"
+          title={strings.home.nearYou}
           onSeeAll={() => router.push('/(tabs)/search')}
         />
         <View style={styles.nearYouList}>

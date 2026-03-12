@@ -13,12 +13,13 @@ import { Button } from '@/components/ui/button';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
-import { strings } from '@/constants/i18n';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 
 export default function LoginScreen() {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
   const { login } = useAuth();
 
@@ -146,7 +147,7 @@ export default function LoginScreen() {
                   marginBottom: Spacing.lg,
                 },
               ]}>
-              Sent to {email}
+              {strings.auth.sentTo} {email}
             </Text>
             <Button
               title={strings.auth.verify}

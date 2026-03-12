@@ -6,22 +6,21 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import type { AppMode } from '@/types';
 
-type CategoryKey = 'dining' | 'nightlife' | 'bars' | 'cafes';
+type CategoryKey = 'dining' | 'nightlife';
 
 interface CategoryItem {
   key: CategoryKey;
-  label: string;
+  labelKey: 'dining' | 'nightlife';
   icon: keyof typeof MaterialIcons.glyphMap;
   mode?: AppMode;
 }
 
 const CATEGORIES: CategoryItem[] = [
-  { key: 'dining', label: 'Dining', icon: 'restaurant', mode: 'dining' },
-  { key: 'nightlife', label: 'Nightlife', icon: 'nightlife', mode: 'nightlife' },
-  { key: 'bars', label: 'Bars', icon: 'local-bar' },
-  { key: 'cafes', label: 'Cafes', icon: 'local-cafe' },
+  { key: 'dining', labelKey: 'dining', icon: 'restaurant', mode: 'dining' },
+  { key: 'nightlife', labelKey: 'nightlife', icon: 'nightlife', mode: 'nightlife' },
 ];
 
 interface CategoryTabsProps {
@@ -31,6 +30,7 @@ interface CategoryTabsProps {
 
 export function CategoryTabs({ selected, onSelect }: CategoryTabsProps) {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   return (
@@ -60,7 +60,7 @@ export function CategoryTabs({ selected, onSelect }: CategoryTabsProps) {
                   color: isActive ? colors.primary : colors.textSecondary,
                 },
               ]}>
-              {cat.label}
+              {strings.onboarding[cat.labelKey]}
             </Text>
           </Pressable>
         );

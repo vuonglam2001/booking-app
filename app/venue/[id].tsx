@@ -18,8 +18,8 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
-import { strings } from '@/constants/i18n';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { getVenueById } from '@/data';
 import { formatTime } from '@/utils/format';
@@ -52,6 +52,7 @@ const MOCK_REVIEWS: Review[] = [
 export default function VenueDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
   const { isAuthenticated } = useAuth();
 
@@ -177,7 +178,7 @@ export default function VenueDetailScreen() {
                   fontWeight: '600',
                 },
               ]}>
-              {descriptionExpanded ? 'Show less' : strings.venue.readMore}
+              {descriptionExpanded ? strings.venue.showLess : strings.venue.readMore}
             </Text>
           </Pressable>
         </View>

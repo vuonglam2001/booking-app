@@ -14,8 +14,8 @@ import { VenueListItem } from '@/components/ui/venue-list-item';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
-import { strings } from '@/constants/i18n';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { useVenues } from '@/hooks/use-venues';
 import type { CuisineType, MusicType, PriceLevel, Venue } from '@/types';
 
@@ -55,6 +55,7 @@ const RATING_FILTERS: Array<{ label: string; value: number | null }> = [
 
 export default function SearchScreen() {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   const [searchQuery, setSearchQuery] = useState('');

@@ -8,11 +8,14 @@ import 'react-native-reanimated';
 import { AppModeProvider } from '@/contexts/app-mode-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import { BookingsProvider } from '@/contexts/bookings-context';
+import { LanguageProvider } from '@/contexts/language-context';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { ThemeColors } from '@/constants/theme';
 
 function RootNavigator() {
   const { mode, isInitialized, hasOnboarded } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   if (!isInitialized) return null;
@@ -58,7 +61,7 @@ function RootNavigator() {
         <Stack.Screen
           name="booking/[venueId]"
           options={{
-            title: 'Book a Table',
+            title: strings.booking.title,
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
           }}
@@ -82,7 +85,7 @@ function RootNavigator() {
           name="auth/login"
           options={{
             presentation: 'modal',
-            title: 'Sign In',
+            title: strings.profile.signIn,
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
           }}
@@ -118,12 +121,14 @@ export default function RootLayout() {
   }
 
   return (
-    <AppModeProvider>
-      <AuthProvider>
-        <BookingsProvider>
-          <RootNavigator />
-        </BookingsProvider>
-      </AuthProvider>
-    </AppModeProvider>
+    <LanguageProvider>
+      <AppModeProvider>
+        <AuthProvider>
+          <BookingsProvider>
+            <RootNavigator />
+          </BookingsProvider>
+        </AuthProvider>
+      </AppModeProvider>
+    </LanguageProvider>
   );
 }

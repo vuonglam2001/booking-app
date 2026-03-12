@@ -1,4 +1,120 @@
-export const strings = {
+export type Strings = {
+  onboarding: {
+    title: string;
+    subtitle: string;
+    dining: string;
+    diningDesc: string;
+    nightlife: string;
+    nightlifeDesc: string;
+  };
+  home: {
+    greeting: string;
+    searchPlaceholder: string;
+    searchPlaceholderNightlife: string;
+    trending: string;
+    trendingNightlife: string;
+    nearYou: string;
+    topRated: string;
+    seeAll: string;
+    findRestaurants: string;
+    findVenues: string;
+    allDistricts: string;
+  };
+  search: {
+    title: string;
+    placeholder: string;
+    noResults: string;
+    noResultsDesc: string;
+  };
+  venue: {
+    about: string;
+    hours: string;
+    photos: string;
+    reviews: string;
+    readMore: string;
+    showLess: string;
+    bookNow: string;
+  };
+  booking: {
+    title: string;
+    selectDate: string;
+    selectTime: string;
+    guests: string;
+    specialRequests: string;
+    specialRequestsPlaceholder: string;
+    confirm: string;
+    unavailable: string;
+  };
+  confirmation: {
+    title: string;
+    subtitle: string;
+    reservationId: string;
+    venue: string;
+    date: string;
+    time: string;
+    guests: string;
+    viewBookings: string;
+    backHome: string;
+  };
+  bookings: {
+    title: string;
+    upcoming: string;
+    past: string;
+    empty: string;
+    emptyDesc: string;
+    cancel: string;
+  };
+  profile: {
+    title: string;
+    signIn: string;
+    signInPrompt: string;
+    signOut: string;
+    appMode: string;
+    notifications: string;
+    language: string;
+    about: string;
+    savedVenues: string;
+    accountSettings: string;
+  };
+  auth: {
+    title: string;
+    emailPlaceholder: string;
+    sendCode: string;
+    otpTitle: string;
+    otpSubtitle: string;
+    verify: string;
+    sentTo: string;
+  };
+  filters: {
+    cuisine: string;
+    music: string;
+    price: string;
+    rating: string;
+    all: string;
+  };
+  common: {
+    guest: string;
+    guests: string;
+    today: string;
+    tomorrow: string;
+    loading: string;
+    error: string;
+    retry: string;
+    cancel: string;
+    confirm: string;
+    done: string;
+    save: string;
+  };
+};
+
+export type Language = 'en' | 'vi';
+
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  en: 'English',
+  vi: 'Tiếng Việt',
+};
+
+const en: Strings = {
   onboarding: {
     title: 'Welcome to Spotly',
     subtitle: 'Find your perfect spot',
@@ -9,11 +125,16 @@ export const strings = {
   },
   home: {
     greeting: 'Find your spot',
-    searchPlaceholder: 'Search restaurants & venues...',
+    searchPlaceholder: 'Find a restaurant nearby...',
+    searchPlaceholderNightlife: 'Find a place for tonight...',
     trending: 'Trending Now',
+    trendingNightlife: 'Trending Tonight',
     nearYou: 'Near You',
     topRated: 'Top Rated',
     seeAll: 'See all',
+    findRestaurants: 'Find restaurants',
+    findVenues: 'Find venues',
+    allDistricts: 'All Districts',
   },
   search: {
     title: 'Search',
@@ -27,6 +148,7 @@ export const strings = {
     photos: 'Photos',
     reviews: 'Reviews',
     readMore: 'Read more',
+    showLess: 'Show less',
     bookNow: 'Book Now',
   },
   booking: {
@@ -67,6 +189,8 @@ export const strings = {
     notifications: 'Notifications',
     language: 'Language',
     about: 'About Spotly',
+    savedVenues: 'Saved Venues',
+    accountSettings: 'Account Settings',
   },
   auth: {
     title: 'Sign in to continue',
@@ -75,6 +199,7 @@ export const strings = {
     otpTitle: 'Enter verification code',
     otpSubtitle: 'We sent a code to your email',
     verify: 'Verify',
+    sentTo: 'Sent to',
   },
   filters: {
     cuisine: 'Cuisine',
@@ -96,4 +221,115 @@ export const strings = {
     done: 'Done',
     save: 'Save',
   },
-} as const;
+};
+
+const vi: Strings = {
+  onboarding: {
+    title: 'Chào mừng đến Spotly',
+    subtitle: 'Tìm địa điểm hoàn hảo của bạn',
+    dining: 'Ẩm thực',
+    diningDesc: 'Khám phá những nhà hàng tốt nhất',
+    nightlife: 'Giải trí đêm',
+    nightlifeDesc: 'Khám phá quán bar, club & lounge',
+  },
+  home: {
+    greeting: 'Tìm địa điểm của bạn',
+    searchPlaceholder: 'Tìm nhà hàng gần bạn...',
+    searchPlaceholderNightlife: 'Tìm địa điểm tối nay...',
+    trending: 'Đang thịnh hành',
+    trendingNightlife: 'Thịnh hành tối nay',
+    nearYou: 'Gần bạn',
+    topRated: 'Đánh giá cao',
+    seeAll: 'Xem tất cả',
+    findRestaurants: 'Tìm nhà hàng',
+    findVenues: 'Tìm địa điểm',
+    allDistricts: 'Tất cả quận',
+  },
+  search: {
+    title: 'Tìm kiếm',
+    placeholder: 'Tìm địa điểm...',
+    noResults: 'Không tìm thấy địa điểm',
+    noResultsDesc: 'Hãy thử điều chỉnh tìm kiếm hoặc bộ lọc',
+  },
+  venue: {
+    about: 'Giới thiệu',
+    hours: 'Giờ mở cửa',
+    photos: 'Hình ảnh',
+    reviews: 'Đánh giá',
+    readMore: 'Xem thêm',
+    showLess: 'Thu gọn',
+    bookNow: 'Đặt ngay',
+  },
+  booking: {
+    title: 'Đặt bàn',
+    selectDate: 'Chọn ngày',
+    selectTime: 'Chọn giờ',
+    guests: 'Số khách',
+    specialRequests: 'Yêu cầu đặc biệt',
+    specialRequestsPlaceholder: 'Yêu cầu về chế độ ăn hoặc sở thích...',
+    confirm: 'Xác nhận đặt chỗ',
+    unavailable: 'Không khả dụng',
+  },
+  confirmation: {
+    title: 'Đặt chỗ thành công!',
+    subtitle: 'Đặt chỗ của bạn đã được xác nhận',
+    reservationId: 'Mã đặt chỗ',
+    venue: 'Địa điểm',
+    date: 'Ngày',
+    time: 'Giờ',
+    guests: 'Số khách',
+    viewBookings: 'Xem đặt chỗ của tôi',
+    backHome: 'Về trang chủ',
+  },
+  bookings: {
+    title: 'Đặt chỗ của tôi',
+    upcoming: 'Sắp tới',
+    past: 'Đã qua',
+    empty: 'Chưa có đặt chỗ nào',
+    emptyDesc: 'Đặt chỗ của bạn sẽ xuất hiện ở đây',
+    cancel: 'Hủy đặt chỗ',
+  },
+  profile: {
+    title: 'Hồ sơ',
+    signIn: 'Đăng nhập',
+    signInPrompt: 'Đăng nhập để quản lý đặt chỗ',
+    signOut: 'Đăng xuất',
+    appMode: 'Chế độ ứng dụng',
+    notifications: 'Thông báo',
+    language: 'Ngôn ngữ',
+    about: 'Về Spotly',
+    savedVenues: 'Địa điểm đã lưu',
+    accountSettings: 'Cài đặt tài khoản',
+  },
+  auth: {
+    title: 'Đăng nhập để tiếp tục',
+    emailPlaceholder: 'Nhập email của bạn',
+    sendCode: 'Gửi mã',
+    otpTitle: 'Nhập mã xác thực',
+    otpSubtitle: 'Chúng tôi đã gửi mã đến email của bạn',
+    verify: 'Xác thực',
+    sentTo: 'Đã gửi đến',
+  },
+  filters: {
+    cuisine: 'Ẩm thực',
+    music: 'Âm nhạc',
+    price: 'Giá',
+    rating: 'Đánh giá',
+    all: 'Tất cả',
+  },
+  common: {
+    guest: 'khách',
+    guests: 'khách',
+    today: 'Hôm nay',
+    tomorrow: 'Ngày mai',
+    loading: 'Đang tải...',
+    error: 'Đã xảy ra lỗi',
+    retry: 'Thử lại',
+    cancel: 'Hủy',
+    confirm: 'Xác nhận',
+    done: 'Xong',
+    save: 'Lưu',
+  },
+};
+
+export const translations: Record<Language, Strings> = { en, vi };

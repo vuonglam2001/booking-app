@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -16,17 +17,22 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography, FontFamily } from '@/constants/typography';
-import { strings } from '@/constants/i18n';
+import { LANGUAGE_LABELS, type Language } from '@/constants/i18n';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { useBookings } from '@/hooks/use-bookings';
 
 export default function ProfileScreen() {
   const { mode } = useAppMode();
   const colors = ThemeColors[mode];
+  const { language, setLanguage, strings } = useLanguage();
   const { isAuthenticated, user, logout } = useAuth();
   const { reservations } = useBookings();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
+
+  const languageOptions: Language[] = ['en', 'vi'];
 
   const bookingsCount = reservations.length;
   const favoritesCount = 5;
@@ -116,7 +122,7 @@ export default function ProfileScreen() {
             <View style={styles.menuLeft}>
               <MaterialIcons name="favorite-border" size={22} color={colors.textSecondary} />
               <Text style={[Typography.body, { color: colors.text, marginLeft: Spacing.md }]}>
-                Saved Venues
+                {strings.profile.savedVenues}
               </Text>
             </View>
             <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
@@ -142,7 +148,7 @@ export default function ProfileScreen() {
           {/* Language */}
           <Pressable
             style={[styles.menuItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}
-            onPress={() => {}}>
+            onPress={() => setLanguageModalVisible(true)}>
             <View style={styles.menuLeft}>
               <MaterialIcons name="language" size={22} color={colors.textSecondary} />
               <Text style={[Typography.body, { color: colors.text, marginLeft: Spacing.md }]}>
@@ -151,7 +157,7 @@ export default function ProfileScreen() {
             </View>
             <View style={styles.menuRight}>
               <Text style={[Typography.bodySm, { color: colors.textSecondary, marginRight: Spacing.sm }]}>
-                English
+                {LANGUAGE_LABELS[language]}
               </Text>
               <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
             </View>
@@ -162,7 +168,7 @@ export default function ProfileScreen() {
             <View style={styles.menuLeft}>
               <MaterialIcons name="settings" size={22} color={colors.textSecondary} />
               <Text style={[Typography.body, { color: colors.text, marginLeft: Spacing.md }]}>
-                Account Settings
+                {strings.profile.accountSettings}
               </Text>
             </View>
             <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
@@ -183,6 +189,46 @@ export default function ProfileScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Language Picker Modal */}
+      <Modal
+        visible={languageModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLanguageModalVisible(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setLanguageModalVisible(false)}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {strings.profile.language}
+            </Text>
+            {languageOptions.map((lang) => (
+              <Pressable
+                key={lang}
+                style={[
+                  styles.languageOption,
+                  { borderBottomColor: colors.border },
+                ]}
+                onPress={() => {
+                  setLanguage(lang);
+                  setLanguageModalVisible(false);
+                }}>
+                <Text
+                  style={[
+                    Typography.body,
+                    { color: lang === language ? colors.primary : colors.text },
+                  ]}>
+                  {LANGUAGE_LABELS[lang]}
+                </Text>
+                {lang === language && (
+                  <MaterialIcons name="check" size={20} color={colors.primary} />
+                )}
+              </Pressable>
+            ))}
+          </View>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -283,5 +329,30 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: 28,
     borderWidth: 1.5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    borderRadius: 16,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.md,
+  },
+  modalTitle: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 18,
+    marginBottom: Spacing.md,
+    textAlign: 'center',
+  },
+  languageOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1,
   },
 });

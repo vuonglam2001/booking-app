@@ -10,13 +10,14 @@ import { router } from 'expo-router';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
-import { strings } from '@/constants/i18n';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import type { AppMode } from '@/types';
 
 export default function OnboardingScreen() {
   const { mode, setMode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   const fadeIn = useSharedValue(0);

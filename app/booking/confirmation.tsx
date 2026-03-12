@@ -12,14 +12,15 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
-import { strings } from '@/constants/i18n';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import { useBookings } from '@/hooks/use-bookings';
 import { formatDate, formatTime } from '@/utils/format';
 
 export default function ConfirmationScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
   const { reservations } = useBookings();
 

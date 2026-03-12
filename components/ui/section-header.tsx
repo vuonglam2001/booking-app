@@ -5,6 +5,7 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 
 interface SectionHeaderProps {
   title: string;
@@ -13,6 +14,7 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ title, onSeeAll }: SectionHeaderProps) {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   return (
@@ -21,7 +23,7 @@ export function SectionHeader({ title, onSeeAll }: SectionHeaderProps) {
       {onSeeAll && (
         <Pressable onPress={onSeeAll} hitSlop={8}>
           <Text style={[Typography.bodySm, { color: colors.primary, fontFamily: 'Geist-Medium' }]}>
-            See all
+            {strings.home.seeAll}
           </Text>
         </Pressable>
       )}

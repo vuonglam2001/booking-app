@@ -6,6 +6,7 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography, FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -23,6 +24,7 @@ interface BookingFilterBarProps {
 
 export function BookingFilterBar({ onSearch, onFilter }: BookingFilterBarProps) {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   const [guests, setGuests] = useState(2);
@@ -62,7 +64,7 @@ export function BookingFilterBar({ onSearch, onFilter }: BookingFilterBarProps) 
             Ho Chi Minh
           </Text>
           <Text style={[styles.locationSub, { color: colors.textSecondary }]}>
-            (All Districts)
+            ({strings.home.allDistricts})
           </Text>
         </View>
         <MaterialIcons name="chevron-right" size={22} color={colors.textTertiary} />
@@ -73,7 +75,7 @@ export function BookingFilterBar({ onSearch, onFilter }: BookingFilterBarProps) 
         style={[styles.searchButton, { backgroundColor: colors.primary }]}
         onPress={onSearch}>
         <Text style={[styles.searchText, { color: colors.primaryForeground }]}>
-          {mode === 'dining' ? 'Find restaurants' : 'Find venues'}
+          {mode === 'dining' ? strings.home.findRestaurants : strings.home.findVenues}
         </Text>
       </Pressable>
     </View>
