@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\")",
+      "Bash(ls -R \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app\" 2>/dev/null)",
+      "Bash(find \"C:\\\\Users\\\\ADMIN\\\\Desktop\\\\New folder \\(2\\)\\\\booking-app\" -type f -name \"*.tsx\" -o -name \"*.ts\" -o -name \"*.json\" | head -50)",
+      "Bash(find \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app\" -type f)",
+      "Bash(find \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/components\" -type f)",
+      "Bash(find \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/constants\" -type f)",
+      "Bash(find \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/hooks\" -type f)",
+      "Bash(find \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/scripts\" -type f)",
+      "Bash(find \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/assets\" -type f)",
+      "Bash(find \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\" -type f -not -path \"*/node_modules/*\" -not -path \"*/.git/*\" -not -path \"*/assets/images/*\" -not -path \"*/assets/fonts/*\" | sort)",
+      "Bash(ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\")",
+      "Bash(find \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/assets\" -type f | sort)",
+      "Bash(cd \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\" && npx expo install @react-native-async-storage/async-storage 2>&1)",
+      "Bash(ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/\\(tabs\\)/explore.tsx\" \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/modal.tsx\" \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/components/hello-wave.tsx\" 2>&1)",
+      "Bash(ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/\")",
+      "Bash(ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/\\(tabs\\)/\" && ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/auth/\" && ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/booking/\" && ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/venue/\")",
+      "Bash(ls -la \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/components/ui/\")",
+      "Bash(ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/auth/\" 2>/dev/null; ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/booking/\" 2>/dev/null; ls \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app/venue/\" 2>/dev/null)",
+      "Bash(find \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/app\" -name \"*.tsx\" -type f | sort)",
+      "Bash(cd \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\" && npx tsc --noEmit 2>&1 | head -80)",
+      "Bash(cd \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\" && npx tsc --noEmit 2>&1 | head -40)",
+      "Bash(cd \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\" && npx tsc --noEmit 2>&1 && echo \"✓ TypeScript OK\")",
+      "Bash(cd \"C:/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app\" && echo \"=== Types ===\" && ls types/ && echo \"=== Constants ===\" && ls constants/ && echo \"=== Utils ===\" && ls utils/ && echo \"=== Contexts ===\" && ls contexts/ && echo \"=== Hooks ===\" && ls hooks/ && echo \"=== Data ===\" && ls data/ && echo \"=== UI Components ===\" && ls components/ui/ && echo \"=== Screens ===\" && ls app/*.tsx && echo \"=== Tabs ===\" && ls \"app/\\(tabs\\)/\" && echo \"=== Venue ===\" && ls app/venue/ && echo \"=== Booking ===\" && ls app/booking/ && echo \"=== Auth ===\" && ls app/auth/)",
+      "Bash(npm install:*)",
+      "Bash(ls \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/node_modules/@expo-google-fonts/\")",
+      "Bash(cat \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/node_modules/@expo-google-fonts/jetbrains-mono/package.json\")",
+      "Bash(node -e \"try { const m = require\\(''@expo-google-fonts/jetbrains-mono''\\); console.log\\(Object.keys\\(m\\).slice\\(0,5\\)\\); } catch\\(e\\) { console.log\\(e.message\\); }\")",
+      "Bash(ls \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/node_modules/@expo-google-fonts/jetbrains-mono/\")",
+      "Bash(ls \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/node_modules/@expo-google-fonts/jetbrains-mono/\"*.*)",
+      "Bash(head -5 \"/c/Users/ADMIN/Desktop/New folder \\(2\\)/booking-app/node_modules/@expo-google-fonts/jetbrains-mono/useFonts.js\")"
+    ]
+  }
+}
