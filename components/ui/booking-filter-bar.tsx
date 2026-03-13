@@ -8,10 +8,12 @@ import { Typography, FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_NAMES_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_NAMES_VI = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
-function formatShortDate(date: Date): string {
-  const day = DAY_NAMES[date.getDay()];
+function formatShortDate(date: Date, language: string): string {
+  const dayNames = language === 'vi' ? DAY_NAMES_VI : DAY_NAMES_EN;
+  const day = dayNames[date.getDay()];
   const d = date.getDate().toString().padStart(2, '0');
   const m = (date.getMonth() + 1).toString().padStart(2, '0');
   return `${day} ${d}/${m}`;
@@ -24,7 +26,7 @@ interface BookingFilterBarProps {
 
 export function BookingFilterBar({ onSearch, onFilter }: BookingFilterBarProps) {
   const { mode } = useAppMode();
-  const { strings } = useLanguage();
+  const { language, strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   const [guests, setGuests] = useState(2);
@@ -44,7 +46,7 @@ export function BookingFilterBar({ onSearch, onFilter }: BookingFilterBarProps) 
           </Text>
           <Text style={[styles.dot, { color: colors.textTertiary }]}>&middot;</Text>
           <Text style={[styles.rowText, { color: colors.text }]}>
-            {formatShortDate(date)}
+            {formatShortDate(date, language)}
           </Text>
           <Text style={[styles.dot, { color: colors.textTertiary }]}>&middot;</Text>
           <Text style={[styles.rowText, { color: colors.text }]}>

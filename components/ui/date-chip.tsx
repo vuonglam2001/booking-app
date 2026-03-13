@@ -5,6 +5,7 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 
 interface DateChipProps {
   date: Date;
@@ -12,13 +13,16 @@ interface DateChipProps {
   onPress: () => void;
 }
 
-const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_NAMES_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAY_NAMES_VI = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
 export function DateChip({ date, selected, onPress }: DateChipProps) {
   const { mode } = useAppMode();
+  const { language } = useLanguage();
   const colors = ThemeColors[mode];
 
-  const dayName = DAY_NAMES[date.getDay()];
+  const dayNames = language === 'vi' ? DAY_NAMES_VI : DAY_NAMES_EN;
+  const dayName = dayNames[date.getDay()];
   const dateNumber = date.getDate();
 
   return (

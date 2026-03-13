@@ -158,6 +158,7 @@ export type Strings = {
     confirm: string;
     done: string;
     save: string;
+    at: string;
   };
 };
 
@@ -328,6 +329,7 @@ const en: Strings = {
     confirm: 'Confirm',
     done: 'Done',
     save: 'Save',
+    at: 'at',
   },
 };
 
@@ -491,6 +493,7 @@ const vi: Strings = {
     confirm: 'Xác nhận',
     done: 'Xong',
     save: 'Lưu',
+    at: 'lúc',
   },
 };
 

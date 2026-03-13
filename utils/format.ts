@@ -10,9 +10,9 @@ export function formatVND(amount: number): string {
   }).format(amount);
 }
 
-export function formatDate(iso: string): string {
+export function formatDate(iso: string, locale: string = 'en-US'): string {
   const date = new Date(iso);
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(locale, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',

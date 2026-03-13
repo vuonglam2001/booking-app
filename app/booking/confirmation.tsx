@@ -21,8 +21,9 @@ import { formatDate, formatTime } from '@/utils/format';
 export default function ConfirmationScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { mode } = useAppMode();
-  const { strings } = useLanguage();
+  const { language, strings } = useLanguage();
   const colors = ThemeColors[mode];
+  const dateLocale = language === 'vi' ? 'vi-VN' : 'en-US';
   const { reservations } = useBookings();
 
   const reservation = useMemo(
@@ -118,7 +119,7 @@ export default function ConfirmationScreen() {
           />
           <DetailRow
             label={strings.confirmation.date}
-            value={formatDate(reservation.date)}
+            value={formatDate(reservation.date, dateLocale)}
             colors={colors}
           />
           <DetailRow

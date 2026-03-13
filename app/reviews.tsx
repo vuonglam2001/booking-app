@@ -29,8 +29,9 @@ interface ReviewWithVenue extends BookingReview {
 
 export default function ReviewsScreen() {
   const { mode } = useAppMode();
-  const { strings } = useLanguage();
+  const { language, strings } = useLanguage();
   const colors = ThemeColors[mode];
+  const dateLocale = language === 'vi' ? 'vi-VN' : 'en-US';
   const [reviews, setReviews] = useState<ReviewWithVenue[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,7 +58,7 @@ export default function ReviewsScreen() {
   const renderItem = useCallback(
     ({ item }: { item: ReviewWithVenue }) => {
       const date = new Date(item.createdAt);
-      const dateStr = date.toLocaleDateString('en-US', {
+      const dateStr = date.toLocaleDateString(dateLocale, {
         month: 'short',
         day: 'numeric',
         year: 'numeric',

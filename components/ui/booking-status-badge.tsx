@@ -5,6 +5,7 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import type { ReservationStatus } from '@/types';
 
 interface BookingStatusBadgeProps {
@@ -13,6 +14,7 @@ interface BookingStatusBadgeProps {
 
 export function BookingStatusBadge({ status }: BookingStatusBadgeProps) {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   const getStatusColor = () => {
@@ -30,8 +32,15 @@ export function BookingStatusBadge({ status }: BookingStatusBadgeProps) {
     }
   };
 
+  const statusLabels: Record<ReservationStatus, string> = {
+    confirmed: strings.bookingDetail.upcoming,
+    ongoing: strings.bookingDetail.ongoing,
+    completed: strings.bookingDetail.completed,
+    cancelled: strings.bookingDetail.cancelled,
+  };
+
   const statusColor = getStatusColor();
-  const label = status.charAt(0).toUpperCase() + status.slice(1);
+  const label = statusLabels[status];
 
   return (
     <View style={[styles.badge, { backgroundColor: statusColor + '1A' }]}>

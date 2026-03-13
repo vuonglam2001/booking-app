@@ -33,9 +33,10 @@ import type { BookingReview } from '@/types';
 export default function BookingDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { mode } = useAppMode();
-  const { strings } = useLanguage();
+  const { language, strings } = useLanguage();
   const colors = ThemeColors[mode];
   const { reservations, cancelReservation } = useBookings();
+  const dateLocale = language === 'vi' ? 'vi-VN' : 'en-US';
 
   const reservation = reservations.find((r) => r.id === id);
   const venue = reservation ? getVenueById(reservation.venueId) : undefined;
@@ -161,7 +162,7 @@ export default function BookingDetailScreen() {
             <InfoRow
               icon="event"
               label={strings.bookingDetail.date}
-              value={formatDate(reservation.date)}
+              value={formatDate(reservation.date, dateLocale)}
               colors={colors}
             />
             <View style={[styles.divider, { backgroundColor: colors.border }]} />

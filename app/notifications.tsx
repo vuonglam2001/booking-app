@@ -18,17 +18,18 @@ const ICON_MAP: Record<NotificationType, keyof typeof MaterialIcons.glyphMap> = 
   review_prompt: 'rate-review',
 };
 
-function formatRelativeDate(iso: string): string {
+function formatRelativeDate(iso: string, language: string): string {
   const now = Date.now();
   const diff = now - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'Just now';
-  if (mins < 60) return `${mins}m ago`;
+  const isVi = language === 'vi';
+  if (mins < 1) return isVi ? 'Vừa xong' : 'Just now';
+  if (mins < 60) return isVi ? `${mins} phút trước` : `${mins}m ago`;
   const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return isVi ? `${hours} giờ trước` : `${hours}h ago`;
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
+  if (days < 7) return isVi ? `${days} ngày trước` : `${days}d ago`;
+  return new Date(iso).toLocaleDateString(isVi ? 'vi-VN' : 'en-US');
 }
 
 export default function NotificationsScreen() {
@@ -89,7 +90,7 @@ export default function NotificationsScreen() {
               {body}
             </Text>
             <Text style={[styles.cardTime, { color: colors.textTertiary }]}>
-              {formatRelativeDate(item.createdAt)}
+              {formatRelativeDate(item.createdAt, language)}
             </Text>
           </View>
         </Pressable>

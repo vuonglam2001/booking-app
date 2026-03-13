@@ -24,9 +24,10 @@ import type { Reservation } from '@/types';
 
 export default function BookingsScreen() {
   const { mode } = useAppMode();
-  const { strings } = useLanguage();
+  const { language, strings } = useLanguage();
   const colors = ThemeColors[mode];
   const { reservations } = useBookings();
+  const dateLocale = language === 'vi' ? 'vi-VN' : 'en-US';
 
   const today = useMemo(() => {
     const d = new Date();
@@ -75,7 +76,7 @@ export default function BookingsScreen() {
         <View style={styles.cardDetailRow}>
           <IconSymbol name="calendar" size={14} color={colors.textSecondary} />
           <Text style={[Typography.caption, { color: colors.textSecondary }]}>
-            {formatDate(reservation.date)} at {formatTime(reservation.time)}
+            {formatDate(reservation.date, dateLocale)} {strings.common.at} {formatTime(reservation.time)}
           </Text>
         </View>
         <View style={styles.cardDetailRow}>
