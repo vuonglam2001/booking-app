@@ -1,3 +1,5 @@
+import { Share } from 'react-native';
+import * as Linking from 'expo-linking';
 import type { PriceLevel } from '@/types';
 
 export function formatVND(amount: number): string {
@@ -45,4 +47,19 @@ export function formatVNDCompact(value: number): string {
 /** Format a price range as "150K - 350K" */
 export function formatPriceRange(min: number, max: number): string {
   return `${formatVNDCompact(min)} - ${formatVNDCompact(max)}`;
+}
+
+/** Generate a deep link URL for a venue */
+export function getVenueDeepLink(venueId: string): string {
+  return Linking.createURL(`/venue/${venueId}`);
+}
+
+/** Share a venue via the native Share sheet */
+export async function shareVenue(venueId: string, venueName: string): Promise<void> {
+  const url = getVenueDeepLink(venueId);
+  await Share.share({
+    message: `Check out ${venueName} on BookingApp! ${url}`,
+    url, // iOS uses this separately
+    title: venueName,
+  });
 }

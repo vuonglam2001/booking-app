@@ -26,7 +26,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { useFavorites } from '@/hooks/use-favorites';
 import { getVenueById } from '@/data';
-import { formatTime } from '@/utils/format';
+import { formatTime, shareVenue } from '@/utils/format';
 import type { Review } from '@/types';
 
 const MOCK_REVIEWS: Review[] = [
@@ -125,18 +125,28 @@ export default function VenueDetailScreen() {
             ]}>
             <IconSymbol name="arrow.left" size={22} color="#FFFFFF" />
           </Pressable>
-          <Pressable
-            onPress={() => toggleFavorite(venue.id)}
-            style={[
-              styles.heartButton,
-              { backgroundColor: 'rgba(0,0,0,0.4)' },
-            ]}>
-            <IconSymbol
-              name={favorited ? 'heart.fill' : 'heart'}
-              size={22}
-              color={favorited ? '#EF4444' : '#FFFFFF'}
-            />
-          </Pressable>
+          <View style={styles.heroActions}>
+            <Pressable
+              onPress={() => shareVenue(venue.id, venue.name)}
+              style={[
+                styles.heroActionBtn,
+                { backgroundColor: 'rgba(0,0,0,0.4)' },
+              ]}>
+              <IconSymbol name="square.and.arrow.up" size={20} color="#FFFFFF" />
+            </Pressable>
+            <Pressable
+              onPress={() => toggleFavorite(venue.id)}
+              style={[
+                styles.heroActionBtn,
+                { backgroundColor: 'rgba(0,0,0,0.4)' },
+              ]}>
+              <IconSymbol
+                name={favorited ? 'heart.fill' : 'heart'}
+                size={22}
+                color={favorited ? '#EF4444' : '#FFFFFF'}
+              />
+            </Pressable>
+          </View>
         </View>
 
         {/* Venue Info */}
@@ -385,10 +395,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heartButton: {
+  heroActions: {
     position: 'absolute',
     top: 52,
     right: Spacing.md,
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  heroActionBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,

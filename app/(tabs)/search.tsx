@@ -546,12 +546,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalTimeItem: {
-    paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm + 2,
     borderRadius: 20,
     borderWidth: 1,
-    minWidth: 70,
     alignItems: 'center',
+    flexBasis: '30%',
+    flexGrow: 1,
+    maxWidth: '33%',
   },
   modalTimeText: {
     fontFamily: FontFamily.sansMedium,

@@ -28,6 +28,7 @@ import { ThemeColors } from "@/constants/theme";
 import { FontFamily } from "@/constants/typography";
 import { getVenuesByMode } from "@/data";
 import { useAppMode } from "@/hooks/use-app-mode";
+import { useFavorites } from "@/hooks/use-favorites";
 import { useLanguage } from "@/hooks/use-language";
 import type { Venue } from "@/types";
 
@@ -105,6 +106,7 @@ const DARK_MAP_STYLE = [
 export default function NearbyMapScreen() {
   const { mode } = useAppMode();
   const { strings } = useLanguage();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const colors = ThemeColors[mode];
   const insets = useSafeAreaInsets();
 
@@ -439,8 +441,17 @@ export default function NearbyMapScreen() {
               />
             </View>
 
-            <View style={styles.cardContent}>
-              <View style={styles.cardInfo}>
+            {/* Header: name + favorite */}
+            <View style={styles.cardHeader}>
+              <Pressable
+                style={{ flex: 1 }}
+                onPress={() =>
+                  router.push({
+                    pathname: "/venue/[id]",
+                    params: { id: selectedVenue.id },
+                  })
+                }
+              >
                 <Text
                   style={[styles.venueName, { color: colors.text }]}
                   numberOfLines={1}
@@ -451,67 +462,88 @@ export default function NearbyMapScreen() {
                   style={[styles.venueAddress, { color: colors.textSecondary }]}
                   numberOfLines={1}
                 >
-                  {selectedVenue.address}
+                  {selectedVenue.address}, {selectedVenue.district}
                 </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => toggleFavorite(selectedVenue.id)}
+                style={[styles.favBtn, { backgroundColor: colors.border + "40" }]}
+              >
+                <MaterialIcons
+                  name={isFavorite(selectedVenue.id) ? "favorite" : "favorite-border"}
+                  size={20}
+                  color={isFavorite(selectedVenue.id) ? "#EF4444" : colors.textSecondary}
+                />
+              </Pressable>
+            </View>
 
-                <View style={styles.metaRow}>
-                  <MaterialIcons name="star" size={14} color="#FBBF24" />
-                  <Text style={[styles.ratingText, { color: colors.text }]}>
-                    {selectedVenue.rating}
-                  </Text>
-                  <Text
-                    style={[styles.priceText, { color: colors.textSecondary }]}
-                  >
-                    {formatVndPrice(
-                      selectedVenue.priceRange.min,
-                      selectedVenue.priceRange.max,
-                    )}
+            {/* Meta badges */}
+            <View style={styles.badgeRow}>
+              <View style={[styles.badge, { backgroundColor: colors.warning + "18" }]}>
+                <MaterialIcons name="star" size={13} color={colors.warning} />
+                <Text style={[styles.badgeText, { color: colors.warning }]}>
+                  {selectedVenue.rating}
+                </Text>
+              </View>
+              <View style={[styles.badge, { backgroundColor: colors.textSecondary + "15" }]}>
+                <MaterialIcons name="payments" size={13} color={colors.textSecondary} />
+                <Text style={[styles.badgeText, { color: colors.textSecondary }]}>
+                  {formatVndPrice(selectedVenue.priceRange.min, selectedVenue.priceRange.max)}
+                </Text>
+              </View>
+              {distance !== null && (
+                <View style={[styles.badge, { backgroundColor: colors.primary + "15" }]}>
+                  <MaterialIcons name="near-me" size={13} color={colors.primary} />
+                  <Text style={[styles.badgeText, { color: colors.primary }]}>
+                    {distance < 1
+                      ? `${Math.round(distance * 1000)}m`
+                      : `${distance.toFixed(1)}km`}
                   </Text>
                 </View>
-
-                {distance !== null && (
-                  <View style={styles.distanceRow}>
-                    <MaterialIcons
-                      name="directions-walk"
-                      size={14}
-                      color={colors.primary}
-                    />
-                    <Text
-                      style={[styles.distanceText, { color: colors.primary }]}
-                    >
-                      {distance < 1
-                        ? `${Math.round(distance * 1000)}m`
-                        : `${distance.toFixed(1)}km`}
-                    </Text>
-                  </View>
-                )}
-
-                <Pressable
-                  style={[styles.bookBtn, { backgroundColor: colors.primary }]}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/venue/[id]",
-                      params: { id: selectedVenue.id },
-                    })
-                  }
-                >
-                  <Text
-                    style={[
-                      styles.bookBtnText,
-                      { color: colors.primaryForeground },
-                    ]}
-                  >
-                    {strings.venue.bookNow}
-                  </Text>
-                </Pressable>
-              </View>
-
-              <View style={styles.thumbColumn}>
-                {selectedVenue.photos?.slice(0, 2).map((url, idx) => (
-                  <Image key={idx} source={{ uri: url }} style={styles.thumb} />
-                ))}
-              </View>
+              )}
             </View>
+
+            {/* Photos strip */}
+            {selectedVenue.photos && selectedVenue.photos.length > 0 && (
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: "/venue/[id]",
+                    params: { id: selectedVenue.id },
+                  })
+                }
+              >
+                <View style={styles.photoStrip}>
+                  {selectedVenue.photos.slice(0, 3).map((url, idx) => (
+                    <Image
+                      key={idx}
+                      source={{ uri: url }}
+                      style={styles.photoStripItem}
+                    />
+                  ))}
+                </View>
+              </Pressable>
+            )}
+
+            {/* Book button */}
+            <Pressable
+              style={[styles.bookBtn, { backgroundColor: colors.primary }]}
+              onPress={() =>
+                router.push({
+                  pathname: "/venue/[id]",
+                  params: { id: selectedVenue.id },
+                })
+              }
+            >
+              <Text
+                style={[
+                  styles.bookBtnText,
+                  { color: colors.primaryForeground },
+                ]}
+              >
+                {strings.venue.bookNow}
+              </Text>
+            </Pressable>
           </>
         )}
       </Animated.View>
@@ -657,12 +689,10 @@ const styles = StyleSheet.create({
     height: 4,
     borderRadius: 2,
   },
-  cardContent: {
+  cardHeader: {
     flexDirection: "row",
-  },
-  cardInfo: {
-    flex: 1,
-    marginRight: Spacing.md,
+    alignItems: "flex-start",
+    gap: Spacing.sm,
   },
   venueName: {
     fontFamily: FontFamily.sansBold,
@@ -672,51 +702,52 @@ const styles = StyleSheet.create({
   venueAddress: {
     fontFamily: FontFamily.sansRegular,
     fontSize: 13,
-    marginBottom: Spacing.sm,
   },
-  metaRow: {
+  favBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  badgeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+    marginTop: Spacing.sm,
+  },
+  badge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    marginBottom: 4,
+    paddingHorizontal: Spacing.sm + 2,
+    paddingVertical: 5,
+    borderRadius: 20,
   },
-  ratingText: {
+  badgeText: {
     fontFamily: FontFamily.sansSemiBold,
-    fontSize: 13,
+    fontSize: 12,
   },
-  priceText: {
-    fontFamily: FontFamily.sansRegular,
-    fontSize: 13,
-    marginLeft: 4,
-  },
-  distanceRow: {
+  photoStrip: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-    marginBottom: Spacing.sm,
+    gap: Spacing.sm,
+    marginTop: Spacing.md,
   },
-  distanceText: {
-    fontFamily: FontFamily.sansMedium,
-    fontSize: 13,
+  photoStripItem: {
+    flex: 1,
+    height: 80,
+    borderRadius: 10,
+    backgroundColor: "#2A2A3C",
   },
   bookBtn: {
-    paddingVertical: Spacing.sm + 2,
-    borderRadius: 12,
+    paddingVertical: Spacing.sm + 4,
+    borderRadius: 14,
     alignItems: "center",
-    marginTop: Spacing.xs,
+    marginTop: Spacing.md,
   },
   bookBtnText: {
     fontFamily: FontFamily.sansSemiBold,
-    fontSize: 14,
-  },
-  thumbColumn: {
-    gap: Spacing.sm,
-  },
-  thumb: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    backgroundColor: "#2A2A3C",
+    fontSize: 15,
   },
   markerWrap: {
     alignItems: "center",

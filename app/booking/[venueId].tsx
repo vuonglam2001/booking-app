@@ -1,7 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -93,6 +96,15 @@ export default function BookingScreen() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [guests, setGuests] = useState(2);
   const [specialRequests, setSpecialRequests] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    const event = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const sub = Keyboard.addListener(event, () => {
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    });
+    return () => sub.remove();
+  }, []);
 
   const timeSlots = useMemo(() => {
     if (!venue) return [];
@@ -146,10 +158,15 @@ export default function BookingScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
       <ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled">
         {/* Venue Header */}
         <View style={styles.venueHeader}>
           <Image
@@ -261,7 +278,7 @@ export default function BookingScreen() {
           disabled={!selectedTime}
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
