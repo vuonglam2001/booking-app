@@ -2,13 +2,13 @@ import React, { useMemo, useState } from 'react';
 import {
   FlatList,
   Image,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { Button } from '@/components/ui/button';
@@ -216,9 +216,6 @@ export default function BookingScreen() {
           </Text>
           <View style={styles.guestCounterRow}>
             <GuestCounter value={guests} onChange={setGuests} min={1} max={20} />
-            <Text style={[Typography.bodySm, { color: colors.textSecondary }]}>
-              {guests} {guests === 1 ? strings.common.guest : strings.common.guests}
-            </Text>
           </View>
         </View>
 

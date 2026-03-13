@@ -32,7 +32,7 @@ export type PriceLevel = 1 | 2 | 3 | 4;
 
 export type VenueType = 'restaurant' | 'bar' | 'club' | 'lounge' | 'rooftop' | 'cafe';
 
-export type ReservationStatus = 'confirmed' | 'completed' | 'cancelled';
+export type ReservationStatus = 'confirmed' | 'ongoing' | 'completed' | 'cancelled';
 
 export interface Venue {
   id: string;
@@ -77,6 +77,14 @@ export interface Reservation {
   guests: number;
   specialRequests?: string;
   status: ReservationStatus;
+  createdAt: string;
+}
+
+export interface BookingReview {
+  bookingId: string;
+  restaurantId: string;
+  rating: number;
+  comment: string;
   createdAt: string;
 }
 

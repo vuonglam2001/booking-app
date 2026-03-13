@@ -19,6 +19,8 @@ export function BookingStatusBadge({ status }: BookingStatusBadgeProps) {
     switch (status) {
       case 'confirmed':
         return colors.success;
+      case 'ongoing':
+        return colors.primary;
       case 'completed':
         return colors.textSecondary;
       case 'cancelled':

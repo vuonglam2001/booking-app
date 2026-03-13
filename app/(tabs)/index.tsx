@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { HomeHeader } from '@/components/ui/home-header';
 import { SearchBar } from '@/components/ui/search-bar';
@@ -115,6 +117,14 @@ export default function HomeScreen() {
           ))}
         </View>
       </ScrollView>
+
+      {/* AI Assistant FAB */}
+      <Pressable
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => router.push('/ai-assistant')}>
+        <MaterialIcons name="auto-awesome" size={22} color={colors.primaryForeground} />
+        <Text style={[styles.fabText, { color: colors.primaryForeground }]}>AI</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -133,5 +143,25 @@ const styles = StyleSheet.create({
   },
   nearYouList: {
     paddingHorizontal: Spacing.md,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: Spacing.lg,
+    right: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: Spacing.md + 2,
+    paddingVertical: Spacing.sm + 4,
+    borderRadius: 28,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  fabText: {
+    fontFamily: 'Geist-SemiBold',
+    fontSize: 14,
   },
 });

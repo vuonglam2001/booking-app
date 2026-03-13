@@ -2,12 +2,12 @@ import React, { useMemo } from 'react';
 import {
   Image,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 
 import { BookingStatusBadge } from '@/components/ui/booking-status-badge';
@@ -37,7 +37,7 @@ export default function BookingsScreen() {
   const upcoming = useMemo(
     () =>
       reservations.filter(
-        (r) => r.date >= today && r.status === 'confirmed'
+        (r) => r.date >= today && (r.status === 'confirmed' || r.status === 'ongoing')
       ),
     [reservations, today]
   );
@@ -56,7 +56,7 @@ export default function BookingsScreen() {
   const renderReservationCard = (reservation: Reservation) => (
     <Pressable
       key={reservation.id}
-      onPress={() => router.push({ pathname: '/venue/[id]', params: { id: reservation.venueId } })}
+      onPress={() => router.push({ pathname: '/booking-detail/[id]', params: { id: reservation.id } })}
       style={[
         styles.card,
         { backgroundColor: colors.surface, borderColor: colors.border },

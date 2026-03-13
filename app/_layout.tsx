@@ -2,6 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import 'react-native-reanimated';
 
@@ -67,6 +68,14 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="booking-detail/[id]"
+          options={{
+            title: strings.bookingDetail.title,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
           name="booking/confirmation"
           options={{
             headerShown: false,
@@ -78,6 +87,14 @@ function RootNavigator() {
           options={{
             presentation: 'modal',
             headerShown: false,
+            gestureEnabled: true,
+          }}
+        />
+        <Stack.Screen
+          name="ai-assistant"
+          options={{
+            headerShown: false,
+            presentation: 'modal',
             gestureEnabled: true,
           }}
         />
@@ -121,14 +138,16 @@ export default function RootLayout() {
   }
 
   return (
-    <LanguageProvider>
-      <AppModeProvider>
-        <AuthProvider>
-          <BookingsProvider>
-            <RootNavigator />
-          </BookingsProvider>
-        </AuthProvider>
-      </AppModeProvider>
-    </LanguageProvider>
+    <SafeAreaProvider>
+      <LanguageProvider>
+        <AppModeProvider>
+          <AuthProvider>
+            <BookingsProvider>
+              <RootNavigator />
+            </BookingsProvider>
+          </AuthProvider>
+        </AppModeProvider>
+      </LanguageProvider>
+    </SafeAreaProvider>
   );
 }

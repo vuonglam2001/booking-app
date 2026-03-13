@@ -92,6 +92,26 @@ export type Strings = {
     rating: string;
     all: string;
   };
+  bookingDetail: {
+    title: string;
+    status: string;
+    date: string;
+    time: string;
+    guests: string;
+    specialRequests: string;
+    cancelBooking: string;
+    reviewTitle: string;
+    reviewPlaceholder: string;
+    submitReview: string;
+    reviewSubmitted: string;
+    reviewThankYou: string;
+    yourRating: string;
+    yourReview: string;
+    ongoing: string;
+    upcoming: string;
+    completed: string;
+    cancelled: string;
+  };
   common: {
     guest: string;
     guests: string;
@@ -208,6 +228,26 @@ const en: Strings = {
     rating: 'Rating',
     all: 'All',
   },
+  bookingDetail: {
+    title: 'Booking Details',
+    status: 'Status',
+    date: 'Date',
+    time: 'Time',
+    guests: 'Guests',
+    specialRequests: 'Special Requests',
+    cancelBooking: 'Cancel Booking',
+    reviewTitle: 'Leave a Review',
+    reviewPlaceholder: 'How was your experience?',
+    submitReview: 'Submit Review',
+    reviewSubmitted: 'Review Submitted!',
+    reviewThankYou: 'Thank you for your feedback',
+    yourRating: 'Your Rating',
+    yourReview: 'Your Review',
+    ongoing: 'Ongoing',
+    upcoming: 'Upcoming',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+  },
   common: {
     guest: 'guest',
     guests: 'guests',
@@ -316,6 +356,26 @@ const vi: Strings = {
     price: 'Giá',
     rating: 'Đánh giá',
     all: 'Tất cả',
+  },
+  bookingDetail: {
+    title: 'Chi tiết đặt chỗ',
+    status: 'Trạng thái',
+    date: 'Ngày',
+    time: 'Giờ',
+    guests: 'Số khách',
+    specialRequests: 'Yêu cầu đặc biệt',
+    cancelBooking: 'Hủy đặt chỗ',
+    reviewTitle: 'Viết đánh giá',
+    reviewPlaceholder: 'Trải nghiệm của bạn thế nào?',
+    submitReview: 'Gửi đánh giá',
+    reviewSubmitted: 'Đã gửi đánh giá!',
+    reviewThankYou: 'Cảm ơn phản hồi của bạn',
+    yourRating: 'Đánh giá của bạn',
+    yourReview: 'Nhận xét của bạn',
+    ongoing: 'Đang diễn ra',
+    upcoming: 'Sắp tới',
+    completed: 'Hoàn thành',
+    cancelled: 'Đã hủy',
   },
   common: {
     guest: 'khách',
