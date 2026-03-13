@@ -117,6 +117,17 @@ export type Strings = {
     guests: string;
     specialRequests: string;
     cancelBooking: string;
+    cancelReasonTitle: string;
+    cancelReasonSubtitle: string;
+    cancelReasons: {
+      changeOfPlans: string;
+      foundBetterOption: string;
+      schedulingConflict: string;
+      tooExpensive: string;
+      weatherConditions: string;
+      other: string;
+    };
+    confirmCancel: string;
     reviewTitle: string;
     reviewPlaceholder: string;
     submitReview: string;
@@ -276,6 +287,17 @@ const en: Strings = {
     guests: 'Guests',
     specialRequests: 'Special Requests',
     cancelBooking: 'Cancel Booking',
+    cancelReasonTitle: 'Cancel Booking',
+    cancelReasonSubtitle: 'Please select a reason for cancellation',
+    cancelReasons: {
+      changeOfPlans: 'Change of plans',
+      foundBetterOption: 'Found a better option',
+      schedulingConflict: 'Scheduling conflict',
+      tooExpensive: 'Too expensive',
+      weatherConditions: 'Weather conditions',
+      other: 'Other',
+    },
+    confirmCancel: 'Confirm Cancellation',
     reviewTitle: 'Leave a Review',
     reviewPlaceholder: 'How was your experience?',
     submitReview: 'Submit Review',
@@ -428,6 +450,17 @@ const vi: Strings = {
     guests: 'Số khách',
     specialRequests: 'Yêu cầu đặc biệt',
     cancelBooking: 'Hủy đặt chỗ',
+    cancelReasonTitle: 'Hủy đặt chỗ',
+    cancelReasonSubtitle: 'Vui lòng chọn lý do hủy',
+    cancelReasons: {
+      changeOfPlans: 'Thay đổi kế hoạch',
+      foundBetterOption: 'Tìm được lựa chọn tốt hơn',
+      schedulingConflict: 'Trùng lịch',
+      tooExpensive: 'Quá đắt',
+      weatherConditions: 'Điều kiện thời tiết',
+      other: 'Lý do khác',
+    },
+    confirmCancel: 'Xác nhận hủy',
     reviewTitle: 'Viết đánh giá',
     reviewPlaceholder: 'Trải nghiệm của bạn thế nào?',
     submitReview: 'Gửi đánh giá',

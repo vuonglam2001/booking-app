@@ -10,12 +10,12 @@ interface BookingsState {
 
 type BookingsAction =
   | { type: 'ADD_RESERVATION'; reservation: Reservation }
-  | { type: 'CANCEL_RESERVATION'; id: string }
+  | { type: 'CANCEL_RESERVATION'; id: string; reason?: string }
   | { type: 'LOAD_RESERVATIONS'; reservations: Reservation[] };
 
 interface BookingsContextValue extends BookingsState {
   addReservation: (reservation: Reservation) => void;
-  cancelReservation: (id: string) => void;
+  cancelReservation: (id: string, reason?: string) => void;
 }
 
 export const BookingsContext = createContext<BookingsContextValue>({
@@ -32,7 +32,7 @@ function reducer(state: BookingsState, action: BookingsAction): BookingsState {
       return {
         ...state,
         reservations: state.reservations.map((r) =>
-          r.id === action.id ? { ...r, status: 'cancelled' as const } : r
+          r.id === action.id ? { ...r, status: 'cancelled' as const, cancelReason: action.reason } : r
         ),
       };
     case 'LOAD_RESERVATIONS':
@@ -77,11 +77,11 @@ export function BookingsProvider({ children }: PropsWithChildren) {
     await setItem('@spotly/reservations', updated);
   };
 
-  const cancelReservation = async (id: string) => {
+  const cancelReservation = async (id: string, reason?: string) => {
     const updated = state.reservations.map((r) =>
-      r.id === id ? { ...r, status: 'cancelled' as const } : r
+      r.id === id ? { ...r, status: 'cancelled' as const, cancelReason: reason } : r
     );
-    dispatch({ type: 'CANCEL_RESERVATION', id });
+    dispatch({ type: 'CANCEL_RESERVATION', id, reason });
     await setItem('@spotly/reservations', updated);
   };
 

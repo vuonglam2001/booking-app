@@ -3,7 +3,9 @@ import {
   Image,
   Keyboard,
   KeyboardAvoidingView,
+  Modal,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -42,6 +44,8 @@ export default function BookingDetailScreen() {
   const [comment, setComment] = useState('');
   const [existingReview, setExistingReview] = useState<BookingReview | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [selectedReason, setSelectedReason] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -92,8 +96,24 @@ export default function BookingDetailScreen() {
   };
 
   const handleCancel = () => {
-    cancelReservation(reservation.id);
+    setCancelModalVisible(true);
   };
+
+  const handleConfirmCancel = () => {
+    if (!selectedReason) return;
+    cancelReservation(reservation.id, selectedReason);
+    setCancelModalVisible(false);
+    setSelectedReason(null);
+  };
+
+  const cancelReasonKeys = [
+    'changeOfPlans',
+    'foundBetterOption',
+    'schedulingConflict',
+    'tooExpensive',
+    'weatherConditions',
+    'other',
+  ] as const;
 
   const isCompleted = reservation.status === 'completed';
   const canCancel = reservation.status === 'confirmed' || reservation.status === 'ongoing';
@@ -171,6 +191,18 @@ export default function BookingDetailScreen() {
             )}
           </View>
         </View>
+
+        {/* Cancel Reason (shown when cancelled) */}
+        {reservation.status === 'cancelled' && reservation.cancelReason && (
+          <View style={styles.section}>
+            <View style={[styles.cancelReasonCard, { backgroundColor: colors.error + '10', borderColor: colors.error + '30' }]}>
+              <MaterialIcons name="info-outline" size={20} color={colors.error} />
+              <Text style={[Typography.body, { color: colors.error, flex: 1 }]}>
+                {strings.bookingDetail.cancelReasons[reservation.cancelReason as keyof typeof strings.bookingDetail.cancelReasons] ?? reservation.cancelReason}
+              </Text>
+            </View>
+          </View>
+        )}
 
         {/* Special Requests */}
         {reservation.specialRequests && (
@@ -269,6 +301,76 @@ export default function BookingDetailScreen() {
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Cancel Reason Modal */}
+      <Modal
+        visible={cancelModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCancelModalVisible(false)}>
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setCancelModalVisible(false)}>
+          <Pressable
+            style={[styles.modalContent, { backgroundColor: colors.surface }]}
+            onPress={() => {}}>
+            <Text style={[Typography.h3, { color: colors.text, marginBottom: Spacing.xs }]}>
+              {strings.bookingDetail.cancelReasonTitle}
+            </Text>
+            <Text style={[Typography.bodySm, { color: colors.textSecondary, marginBottom: Spacing.lg }]}>
+              {strings.bookingDetail.cancelReasonSubtitle}
+            </Text>
+
+            {cancelReasonKeys.map((key) => {
+              const label = strings.bookingDetail.cancelReasons[key];
+              const isSelected = selectedReason === key;
+              return (
+                <Pressable
+                  key={key}
+                  onPress={() => setSelectedReason(key)}
+                  style={[
+                    styles.reasonOption,
+                    {
+                      borderColor: isSelected ? colors.primary : colors.border,
+                      backgroundColor: isSelected ? colors.primary + '10' : colors.background,
+                    },
+                  ]}>
+                  <View
+                    style={[
+                      styles.radioOuter,
+                      { borderColor: isSelected ? colors.primary : colors.textTertiary },
+                    ]}>
+                    {isSelected && (
+                      <View style={[styles.radioInner, { backgroundColor: colors.primary }]} />
+                    )}
+                  </View>
+                  <Text style={[Typography.body, { color: colors.text, flex: 1 }]}>
+                    {label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+
+            <View style={styles.modalActions}>
+              <Button
+                title={strings.common.cancel}
+                onPress={() => {
+                  setCancelModalVisible(false);
+                  setSelectedReason(null);
+                }}
+                variant="ghost"
+                style={{ flex: 1 }}
+              />
+              <Button
+                title={strings.bookingDetail.confirmCancel}
+                onPress={handleConfirmCancel}
+                disabled={!selectedReason}
+                style={{ flex: 1 }}
+              />
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -353,6 +455,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: Spacing.md,
   },
+  cancelReasonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: Spacing.md,
+  },
   reviewCard: {
     borderRadius: 16,
     borderWidth: 1,
@@ -380,5 +490,45 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
     marginBottom: Spacing.md,
     minHeight: 100,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.lg,
+  },
+  modalContent: {
+    width: '100%',
+    borderRadius: 20,
+    padding: Spacing.lg,
+  },
+  reasonOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    marginBottom: Spacing.sm,
+  },
+  radioOuter: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioInner: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+    marginTop: Spacing.lg,
   },
 });

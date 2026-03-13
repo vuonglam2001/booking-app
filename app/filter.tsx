@@ -95,6 +95,8 @@ export default function FilterScreen() {
   const colors = ThemeColors[mode];
 
   const [guests, setGuests] = useState(2);
+  const [customGuestInput, setCustomGuestInput] = useState(false);
+  const [guestInputValue, setGuestInputValue] = useState('');
   const [selectedTime, setSelectedTime] = useState('19:00');
   const [selectedCity, setSelectedCity] = useState('Ho Chi Minh');
   const [selectedDistrict, setSelectedDistrict] = useState(strings.filters.allDistricts);
@@ -119,6 +121,8 @@ export default function FilterScreen() {
 
   const clearAll = () => {
     setGuests(2);
+    setCustomGuestInput(false);
+    setGuestInputValue('');
     setSelectedTime('19:00');
     setSelectedCity('Ho Chi Minh');
     setSelectedDistrict(strings.filters.allDistricts);
@@ -170,20 +174,23 @@ export default function FilterScreen() {
             {GUEST_OPTIONS.map((n) => (
               <Pressable
                 key={n}
-                onPress={() => setGuests(n)}
+                onPress={() => {
+                  setGuests(n);
+                  setCustomGuestInput(false);
+                }}
                 style={[
                   styles.gridItem,
                   {
-                    borderColor: guests === n ? colors.primary : colors.border,
-                    backgroundColor: guests === n ? colors.primary + '10' : colors.surface,
+                    borderColor: guests === n && !customGuestInput ? colors.primary : colors.border,
+                    backgroundColor: guests === n && !customGuestInput ? colors.primary + '10' : colors.surface,
                   },
                 ]}>
                 <Text
                   style={[
                     styles.gridText,
                     {
-                      color: guests === n ? colors.primary : colors.text,
-                      fontFamily: guests === n ? FontFamily.sansSemiBold : FontFamily.sansRegular,
+                      color: guests === n && !customGuestInput ? colors.primary : colors.text,
+                      fontFamily: guests === n && !customGuestInput ? FontFamily.sansSemiBold : FontFamily.sansRegular,
                     },
                   ]}>
                   {n}
@@ -191,11 +198,73 @@ export default function FilterScreen() {
               </Pressable>
             ))}
             <Pressable
-              onPress={() => setGuests(Math.min(guests + 1, 20))}
-              style={[styles.gridItem, { borderColor: colors.border }]}>
-              <MaterialIcons name="add" size={22} color={colors.textSecondary} />
+              onPress={() => {
+                setCustomGuestInput(true);
+                setGuestInputValue(guests > 9 ? String(guests) : '');
+              }}
+              style={[
+                styles.gridItem,
+                {
+                  borderColor: customGuestInput || guests > 9 ? colors.primary : colors.border,
+                  backgroundColor: customGuestInput || guests > 9 ? colors.primary + '10' : colors.surface,
+                },
+              ]}>
+              <MaterialIcons
+                name="add"
+                size={22}
+                color={customGuestInput || guests > 9 ? colors.primary : colors.textSecondary}
+              />
             </Pressable>
           </View>
+
+          {/* Custom guest input */}
+          {customGuestInput && (
+            <View style={[styles.customGuestRow, { borderColor: colors.primary }]}>
+              <MaterialIcons name="group" size={20} color={colors.primary} />
+              <TextInput
+                style={[styles.customGuestInput, { color: colors.text }]}
+                value={guestInputValue}
+                onChangeText={(t) => setGuestInputValue(t.replace(/[^0-9]/g, ''))}
+                onSubmitEditing={() => {
+                  const parsed = parseInt(guestInputValue, 10);
+                  if (!isNaN(parsed) && parsed >= 1) {
+                    setGuests(Math.min(parsed, 99));
+                    if (parsed <= 9) setCustomGuestInput(false);
+                  }
+                }}
+                onBlur={() => {
+                  const parsed = parseInt(guestInputValue, 10);
+                  if (!isNaN(parsed) && parsed >= 1) {
+                    setGuests(Math.min(parsed, 99));
+                    if (parsed <= 9) setCustomGuestInput(false);
+                  } else if (!guestInputValue) {
+                    setCustomGuestInput(false);
+                  }
+                }}
+                placeholder={strings.filters.numberOfGuests}
+                placeholderTextColor={colors.inputPlaceholder}
+                keyboardType="number-pad"
+                maxLength={2}
+                autoFocus
+              />
+            </View>
+          )}
+
+          {/* Show current guest count when > 9 */}
+          {guests > 9 && !customGuestInput && (
+            <Pressable
+              onPress={() => {
+                setCustomGuestInput(true);
+                setGuestInputValue(String(guests));
+              }}
+              style={[styles.customGuestDisplay, { borderColor: colors.primary, backgroundColor: colors.primary + '10' }]}>
+              <MaterialIcons name="group" size={20} color={colors.primary} />
+              <Text style={[Typography.body, { color: colors.primary, fontFamily: FontFamily.sansSemiBold }]}>
+                {guests} {strings.common.guests}
+              </Text>
+              <MaterialIcons name="edit" size={16} color={colors.primary} />
+            </Pressable>
+          )}
 
           {/* Kid friendly */}
           {mode === 'dining' && (
@@ -506,6 +575,30 @@ const styles = StyleSheet.create({
   },
   gridText: {
     fontSize: 16,
+  },
+  customGuestRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+  },
+  customGuestInput: {
+    flex: 1,
+    fontFamily: FontFamily.sansMedium,
+    fontSize: 16,
+    padding: 0,
+  },
+  customGuestDisplay: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
   },
   checkRow: {
     flexDirection: 'row',

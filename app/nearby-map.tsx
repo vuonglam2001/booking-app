@@ -13,6 +13,7 @@ import {
   FlatList,
   Image,
   Keyboard,
+  PanResponder,
   Platform,
   Pressable,
   StyleSheet,
@@ -112,6 +113,39 @@ export default function NearbyMapScreen() {
 
   const mapRef = useRef<MapView>(null);
   const cardAnim = useRef(new Animated.Value(0)).current;
+  const dragOffset = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gesture) =>
+        gesture.dy > 8 && Math.abs(gesture.dy) > Math.abs(gesture.dx),
+      onPanResponderMove: (_, gesture) => {
+        if (gesture.dy > 0) {
+          dragOffset.setValue(gesture.dy);
+        }
+      },
+      onPanResponderRelease: (_, gesture) => {
+        if (gesture.dy > 80 || gesture.vy > 0.5) {
+          // Dismiss
+          setSelectedVenue(null);
+          Animated.timing(dragOffset, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }).start();
+        } else {
+          // Snap back
+          Animated.spring(dragOffset, {
+            toValue: 0,
+            useNativeDriver: true,
+            tension: 65,
+            friction: 11,
+          }).start();
+        }
+      },
+    }),
+  ).current;
 
   const [userLocation, setUserLocation] = useState<{
     latitude: number;
@@ -180,13 +214,14 @@ export default function NearbyMapScreen() {
 
   // Animate bottom card in/out
   useEffect(() => {
+    dragOffset.setValue(0);
     Animated.spring(cardAnim, {
       toValue: selectedVenue ? 1 : 0,
       useNativeDriver: true,
       tension: 65,
       friction: 11,
     }).start();
-  }, [selectedVenue, cardAnim]);
+  }, [selectedVenue, cardAnim, dragOffset]);
 
   const handleSearchSelect = useCallback((venue: Venue) => {
     setSearchQuery(venue.name);
@@ -239,10 +274,13 @@ export default function NearbyMapScreen() {
     );
   }, [selectedVenue, userLocation]);
 
-  const cardTranslateY = cardAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [300, 0],
-  });
+  const cardTranslateY = Animated.add(
+    cardAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [300, 0],
+    }),
+    dragOffset,
+  );
 
   const isDark = mode === "nightlife";
   const useGoongTiles =
@@ -422,6 +460,7 @@ export default function NearbyMapScreen() {
 
       {/* Bottom venue card */}
       <Animated.View
+        {...panResponder.panHandlers}
         style={[
           styles.bottomCard,
           {
