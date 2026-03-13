@@ -10,6 +10,7 @@ import { AppModeProvider } from '@/contexts/app-mode-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import { BookingsProvider } from '@/contexts/bookings-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';
+import { NotificationsProvider } from '@/contexts/notifications-context';
 import { LanguageProvider } from '@/contexts/language-context';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
@@ -99,6 +100,14 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="notifications"
+          options={{
+            title: strings.notifications.title,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
           name="favorites"
           options={{
             title: strings.profile.savedVenues,
@@ -159,9 +168,11 @@ export default function RootLayout() {
         <AppModeProvider>
           <AuthProvider>
             <BookingsProvider>
-              <FavoritesProvider>
-                <RootNavigator />
-              </FavoritesProvider>
+              <NotificationsProvider>
+                <FavoritesProvider>
+                  <RootNavigator />
+                </FavoritesProvider>
+              </NotificationsProvider>
             </BookingsProvider>
           </AuthProvider>
         </AppModeProvider>

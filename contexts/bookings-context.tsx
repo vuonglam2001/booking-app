@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useReducer, type PropsWithChildren } f
 
 import type { Reservation } from '@/types';
 import { getItem, setItem } from '@/utils/storage';
+import { MOCK_COMPLETED_BOOKINGS } from '@/data/mock-bookings';
 
 interface BookingsState {
   reservations: Reservation[];
@@ -48,7 +49,23 @@ export function BookingsProvider({ children }: PropsWithChildren) {
     async function init() {
       const reservations = await getItem<Reservation[]>('@spotly/reservations');
       if (reservations) {
-        dispatch({ type: 'LOAD_RESERVATIONS', reservations });
+        // Merge mock completed bookings if not already present
+        const mockIds = MOCK_COMPLETED_BOOKINGS.map((b) => b.id);
+        const hasMocks = mockIds.every((id) => reservations.some((r) => r.id === id));
+        if (hasMocks) {
+          dispatch({ type: 'LOAD_RESERVATIONS', reservations });
+        } else {
+          const missing = MOCK_COMPLETED_BOOKINGS.filter(
+            (b) => !reservations.some((r) => r.id === b.id),
+          );
+          const merged = [...reservations, ...missing];
+          dispatch({ type: 'LOAD_RESERVATIONS', reservations: merged });
+          await setItem('@spotly/reservations', merged);
+        }
+      } else {
+        // First launch — seed with mock completed bookings
+        dispatch({ type: 'LOAD_RESERVATIONS', reservations: MOCK_COMPLETED_BOOKINGS });
+        await setItem('@spotly/reservations', MOCK_COMPLETED_BOOKINGS);
       }
     }
     init();

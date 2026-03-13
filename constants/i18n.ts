@@ -129,6 +129,12 @@ export type Strings = {
     completed: string;
     cancelled: string;
   };
+  notifications: {
+    title: string;
+    empty: string;
+    emptyDesc: string;
+    markAllRead: string;
+  };
   common: {
     guest: string;
     guests: string;
@@ -282,6 +288,12 @@ const en: Strings = {
     completed: 'Completed',
     cancelled: 'Cancelled',
   },
+  notifications: {
+    title: 'Notifications',
+    empty: 'No notifications',
+    emptyDesc: "You're all caught up!",
+    markAllRead: 'Mark all as read',
+  },
   common: {
     guest: 'guest',
     guests: 'guests',
@@ -427,6 +439,12 @@ const vi: Strings = {
     upcoming: 'Sắp tới',
     completed: 'Hoàn thành',
     cancelled: 'Đã hủy',
+  },
+  notifications: {
+    title: 'Thông báo',
+    empty: 'Không có thông báo',
+    emptyDesc: 'Bạn đã cập nhật hết rồi!',
+    markAllRead: 'Đánh dấu tất cả đã đọc',
   },
   common: {
     guest: 'khách',

@@ -4,15 +4,16 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
-import { Typography } from '@/constants/typography';
+import { FontFamily, Typography } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
 
 interface HomeHeaderProps {
   onNotificationPress?: () => void;
   onAvatarPress?: () => void;
+  unreadCount?: number;
 }
 
-export function HomeHeader({ onNotificationPress, onAvatarPress }: HomeHeaderProps) {
+export function HomeHeader({ onNotificationPress, onAvatarPress, unreadCount = 0 }: HomeHeaderProps) {
   const { mode } = useAppMode();
   const colors = ThemeColors[mode];
 
@@ -25,6 +26,13 @@ export function HomeHeader({ onNotificationPress, onAvatarPress }: HomeHeaderPro
       <View style={styles.actions}>
         <Pressable onPress={onNotificationPress} hitSlop={8} style={styles.iconButton}>
           <MaterialIcons name="notifications-none" size={24} color={colors.text} />
+          {unreadCount > 0 && (
+            <View style={[styles.badge, { backgroundColor: colors.error }]}>
+              <Text style={styles.badgeText}>
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </Text>
+            </View>
+          )}
         </Pressable>
         <Pressable onPress={onAvatarPress} hitSlop={8}>
           <View style={[styles.avatar, { backgroundColor: colors.border }]}>
@@ -56,6 +64,23 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     padding: 4,
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -4,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    fontFamily: FontFamily.sansBold,
+    fontSize: 10,
+    lineHeight: 14,
+    color: '#FFFFFF',
   },
   avatar: {
     width: 32,

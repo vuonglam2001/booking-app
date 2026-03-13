@@ -16,12 +16,14 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
+import { useNotifications } from '@/hooks/use-notifications';
 import { getVenuesByMode } from '@/data';
 import type { Venue } from '@/types';
 
 export default function HomeScreen() {
   const { mode, setMode } = useAppMode();
   const { strings } = useLanguage();
+  const { unreadCount } = useNotifications();
   const colors = ThemeColors[mode];
   const [category, setCategory] = useState<CategoryKey>(
     mode === 'nightlife' ? 'nightlife' : 'dining'
@@ -73,8 +75,9 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}>
 
         <HomeHeader
-          onNotificationPress={() => {}}
+          onNotificationPress={() => router.push('/notifications')}
           onAvatarPress={() => router.push('/(tabs)/profile')}
+          unreadCount={unreadCount}
         />
 
         <View style={styles.searchWrap}>

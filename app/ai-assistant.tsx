@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -20,10 +20,12 @@ import { Spacing } from '@/constants/spacing';
 import { Typography, FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
+import { useBookings } from '@/hooks/use-bookings';
 import { getAllVenues, getVenueById } from '@/data';
 import { formatPriceRange } from '@/utils/format';
 import { CLAUDE_API_KEY } from '@/constants/api';
-import type { Venue } from '@/types';
+import { processUserMessage, type BookingIntent } from '@/utils/ai-message-processor';
+import type { Reservation, Venue } from '@/types';
 
 interface Recommendation {
   venueId: string;
@@ -35,6 +37,8 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
   recommendations?: Recommendation[];
+  bookingIntent?: BookingIntent;
+  bookingConfirmed?: boolean;
 }
 
 // ── Keyword map for local matching ──────────────────────────────
@@ -236,10 +240,57 @@ export default function AIAssistantScreen() {
   const colors = ThemeColors[mode];
   const insets = useSafeAreaInsets();
   const scrollRef = useRef<ScrollView>(null);
+  const { addReservation } = useBookings();
 
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const scrollToEnd = useCallback(
+    (delay = 100) => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), delay),
+    [],
+  );
+
+  const handleConfirmBooking = useCallback(
+    (intent: BookingIntent, messageIndex: number) => {
+      if (!intent.venueId || !intent.restaurant) return;
+
+      const venue = getVenueById(intent.venueId);
+      if (!venue) return;
+
+      const today = new Date();
+      const dateStr = today.toISOString().split('T')[0];
+
+      const reservation: Reservation = {
+        id: `ai-${Date.now()}`,
+        venueId: intent.venueId,
+        venueName: intent.restaurant,
+        venueImage: venue.imageUrl,
+        date: dateStr,
+        time: intent.time ?? '19:00',
+        guests: intent.people ?? 2,
+        specialRequests: intent.note ?? undefined,
+        status: 'confirmed',
+        createdAt: new Date().toISOString(),
+      };
+
+      addReservation(reservation);
+
+      // Mark the message as confirmed
+      setMessages((prev) =>
+        prev.map((msg, i) => (i === messageIndex ? { ...msg, bookingConfirmed: true } : msg)),
+      );
+
+      // Add confirmation message
+      const confirmMsg: ChatMessage = {
+        role: 'assistant',
+        text: `Your booking at ${intent.restaurant} has been confirmed! ${intent.people ? intent.people + ' guests' : ''} ${intent.time ? 'at ' + intent.time : ''}. Check your bookings for details.`,
+      };
+      setMessages((prev) => [...prev, confirmMsg]);
+      scrollToEnd(200);
+    },
+    [addReservation, scrollToEnd],
+  );
 
   const handleSend = async () => {
     const trimmed = input.trim();
@@ -249,12 +300,44 @@ export default function AIAssistantScreen() {
     setMessages((prev) => [...prev, userMsg]);
     setInput('');
     setLoading(true);
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    scrollToEnd();
 
-    // Call Claude API first
+    // Part 4: Process through message processor
+    const processed = processUserMessage(trimmed);
+
+    // Blocked content
+    if (processed.blocked) {
+      const warningMsg: ChatMessage = {
+        role: 'assistant',
+        text: processed.blockReason ?? 'Message blocked.',
+      };
+      setMessages((prev) => [...prev, warningMsg]);
+      setLoading(false);
+      scrollToEnd(200);
+      return;
+    }
+
+    // Booking intent detected
+    if (processed.intent === 'booking' && processed.booking) {
+      const intent = processed.booking;
+      const venue = intent.venueId ? getVenueById(intent.venueId) : undefined;
+
+      const assistantMsg: ChatMessage = {
+        role: 'assistant',
+        text: venue
+          ? `I found a booking match! Please confirm the details below:`
+          : `I detected a booking request, but couldn't find the restaurant. Could you provide the full name?`,
+        bookingIntent: venue ? intent : undefined,
+      };
+      setMessages((prev) => [...prev, assistantMsg]);
+      setLoading(false);
+      scrollToEnd(200);
+      return;
+    }
+
+    // Normal chat — use Claude API + local fallback
     let recs = await askClaude(trimmed);
 
-    // Fall back to local engine only if API fails
     if (!recs || recs.length === 0) {
       recs = getLocalRecommendations(trimmed);
     }
@@ -266,7 +349,7 @@ export default function AIAssistantScreen() {
     };
     setMessages((prev) => [...prev, assistantMsg]);
     setLoading(false);
-    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 200);
+    scrollToEnd(200);
   };
 
   const renderRecommendationCard = (rec: Recommendation, index: number) => {
@@ -399,6 +482,66 @@ export default function AIAssistantScreen() {
                     {msg.text ? (
                       <Text style={[Typography.body, { color: colors.text }]}>{msg.text}</Text>
                     ) : null}
+                    {msg.bookingIntent && !msg.bookingConfirmed && (
+                      <View style={[styles.bookingCard, { backgroundColor: colors.surface, borderColor: colors.primary + '30' }]}>
+                        {msg.bookingIntent.venueId && (() => {
+                          const v = getVenueById(msg.bookingIntent!.venueId!);
+                          return v ? (
+                            <Image source={{ uri: v.imageUrl }} style={styles.bookingCardImage} resizeMode="cover" />
+                          ) : null;
+                        })()}
+                        <View style={styles.bookingCardBody}>
+                          <View style={styles.bookingCardRow}>
+                            <MaterialIcons name="restaurant" size={16} color={colors.primary} />
+                            <Text style={[styles.bookingCardLabel, { color: colors.textSecondary }]}>Restaurant</Text>
+                            <Text style={[styles.bookingCardValue, { color: colors.text }]} numberOfLines={1}>
+                              {msg.bookingIntent.restaurant ?? 'Not specified'}
+                            </Text>
+                          </View>
+                          <View style={styles.bookingCardRow}>
+                            <MaterialIcons name="group" size={16} color={colors.primary} />
+                            <Text style={[styles.bookingCardLabel, { color: colors.textSecondary }]}>Guests</Text>
+                            <Text style={[styles.bookingCardValue, { color: colors.text }]}>
+                              {msg.bookingIntent.people ?? 2}
+                            </Text>
+                          </View>
+                          <View style={styles.bookingCardRow}>
+                            <MaterialIcons name="schedule" size={16} color={colors.primary} />
+                            <Text style={[styles.bookingCardLabel, { color: colors.textSecondary }]}>Time</Text>
+                            <Text style={[styles.bookingCardValue, { color: colors.text }]}>
+                              {msg.bookingIntent.time ?? 'Not specified'}
+                            </Text>
+                          </View>
+                          {msg.bookingIntent.note && (
+                            <View style={styles.bookingCardRow}>
+                              <MaterialIcons name="note" size={16} color={colors.primary} />
+                              <Text style={[styles.bookingCardLabel, { color: colors.textSecondary }]}>Note</Text>
+                              <Text style={[styles.bookingCardValue, { color: colors.text }]} numberOfLines={2}>
+                                {msg.bookingIntent.note}
+                              </Text>
+                            </View>
+                          )}
+                          <Pressable
+                            style={[styles.confirmBookingBtn, { backgroundColor: colors.primary }]}
+                            onPress={() => handleConfirmBooking(msg.bookingIntent!, i)}>
+                            <MaterialIcons name="check-circle" size={18} color={colors.primaryForeground} />
+                            <Text style={[styles.confirmBookingText, { color: colors.primaryForeground }]}>
+                              {strings.booking.confirm}
+                            </Text>
+                          </Pressable>
+                        </View>
+                      </View>
+                    )}
+                    {msg.bookingConfirmed && msg.bookingIntent && (
+                      <View style={[styles.bookingCard, { backgroundColor: colors.success + '10', borderColor: colors.success + '30' }]}>
+                        <View style={styles.bookingCardBody}>
+                          <View style={styles.confirmedRow}>
+                            <MaterialIcons name="check-circle" size={20} color={colors.success} />
+                            <Text style={[styles.confirmedText, { color: colors.success }]}>Booking Confirmed</Text>
+                          </View>
+                        </View>
+                      </View>
+                    )}
                     {msg.recommendations?.map((rec, idx) =>
                       renderRecommendationCard(rec, idx),
                     )}
@@ -618,5 +761,55 @@ const styles = StyleSheet.create({
     borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  bookingCard: {
+    borderRadius: 14,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  bookingCardImage: {
+    width: '100%',
+    height: 100,
+  },
+  bookingCardBody: {
+    padding: Spacing.md,
+    gap: Spacing.sm,
+  },
+  bookingCardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  bookingCardLabel: {
+    fontFamily: FontFamily.sansRegular,
+    fontSize: 13,
+    width: 80,
+  },
+  bookingCardValue: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 14,
+    flex: 1,
+  },
+  confirmBookingBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: 10,
+    marginTop: Spacing.xs,
+  },
+  confirmBookingText: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 14,
+  },
+  confirmedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  confirmedText: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 15,
   },
 });

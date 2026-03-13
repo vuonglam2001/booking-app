@@ -88,6 +88,20 @@ export interface BookingReview {
   createdAt: string;
 }
 
+export type NotificationType = 'booking_completed' | 'booking_confirmed' | 'review_prompt';
+
+export interface AppNotification {
+  id: string;
+  type: NotificationType;
+  bookingId: string;
+  titleEn: string;
+  titleVi: string;
+  bodyEn: string;
+  bodyVi: string;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface User {
   id: string;
   name: string;
