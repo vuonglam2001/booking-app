@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -124,6 +126,7 @@ export default function FilterScreen() {
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [showTimeModal, setShowTimeModal] = useState(false);
 
+  const scrollRef = useRef<ScrollView>(null);
   const peakHours = mode === 'dining' ? DINING_PEAK_HOURS : NIGHTLIFE_PEAK_HOURS;
 
   const toggleCuisine = (c: CuisineType) => {
@@ -182,9 +185,15 @@ export default function FilterScreen() {
         <View style={{ width: 26 }} />
       </View>
 
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
       <ScrollView
+        ref={scrollRef}
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
 
         {/* Guests */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -595,6 +604,7 @@ export default function FilterScreen() {
                 style={[styles.priceValue, { color: colors.text }]}
                 value={formatVND(parseInt(priceMin || '0', 10))}
                 onChangeText={(t) => setPriceMin(t.replace(/[^0-9]/g, ''))}
+                onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
                 keyboardType="numeric"
                 placeholder="0"
                 placeholderTextColor={colors.inputPlaceholder}
@@ -608,6 +618,7 @@ export default function FilterScreen() {
                 style={[styles.priceValue, { color: colors.text }]}
                 value={formatVND(parseInt(priceMax || '0', 10))}
                 onChangeText={(t) => setPriceMax(t.replace(/[^0-9]/g, ''))}
+                onFocus={() => setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 300)}
                 keyboardType="numeric"
                 placeholder="3,000,000"
                 placeholderTextColor={colors.inputPlaceholder}
@@ -617,6 +628,7 @@ export default function FilterScreen() {
           </View>
         </View>
       </ScrollView>
+      </KeyboardAvoidingView>
 
       {/* Bottom Bar */}
       <View style={[styles.bottomBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
