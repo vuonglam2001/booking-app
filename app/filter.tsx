@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import { ThemeColors } from '@/constants/theme';
@@ -103,13 +103,19 @@ export default function FilterScreen() {
   const { mode } = useAppMode();
   const { strings } = useLanguage();
   const colors = ThemeColors[mode];
+  const params = useLocalSearchParams<{
+    guests?: string;
+    time?: string;
+    district?: string;
+  }>();
 
-  const [guests, setGuests] = useState(2);
-  const [customGuestInput, setCustomGuestInput] = useState(false);
-  const [guestInputValue, setGuestInputValue] = useState('');
-  const [selectedTime, setSelectedTime] = useState('19:00');
+  const initGuests = params.guests ? parseInt(params.guests, 10) || 2 : 2;
+  const [guests, setGuests] = useState(initGuests);
+  const [customGuestInput, setCustomGuestInput] = useState(initGuests > 9);
+  const [guestInputValue, setGuestInputValue] = useState(initGuests > 9 ? String(initGuests) : '');
+  const [selectedTime, setSelectedTime] = useState(params.time || '19:00');
   const [selectedCity, setSelectedCity] = useState('Ho Chi Minh');
-  const [selectedDistrict, setSelectedDistrict] = useState(strings.filters.allDistricts);
+  const [selectedDistrict, setSelectedDistrict] = useState(params.district || strings.filters.allDistricts);
   const [kidFriendly, setKidFriendly] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<CuisineType[]>([]);
   const [selectedMusic, setSelectedMusic] = useState<MusicType[]>([]);
@@ -621,8 +627,20 @@ export default function FilterScreen() {
         </Pressable>
         <Pressable
           onPress={() => {
+            const filterParams: Record<string, string> = {
+              guests: String(guests),
+              time: selectedTime,
+              district: selectedDistrict,
+            };
+            if (selectedRating !== null) filterParams.rating = String(selectedRating);
+            if (mode === 'dining' && selectedCuisines.length > 0) {
+              filterParams.cuisines = selectedCuisines.join(',');
+            }
+            if (mode === 'nightlife' && selectedMusic.length > 0) {
+              filterParams.music = selectedMusic.join(',');
+            }
             router.back();
-            setTimeout(() => router.push('/(tabs)/search'), 100);
+            setTimeout(() => router.push({ pathname: '/(tabs)/search', params: filterParams }), 100);
           }}
           style={[styles.resultsButton, { backgroundColor: colors.primary }]}>
           <Text style={[Typography.button, { color: colors.primaryForeground }]}>

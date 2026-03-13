@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Location from 'expo-location';
 
@@ -24,7 +24,7 @@ import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
 import { useVenues } from '@/hooks/use-venues';
 import { getVenuesByMode } from '@/data';
-import type { Venue } from '@/types';
+import type { CuisineType, MusicType, Venue } from '@/types';
 
 // Full 24h time slots, every 30 minutes
 const ALL_TIME_OPTIONS: string[] = [];
@@ -52,6 +52,14 @@ export default function SearchScreen() {
   const { mode } = useAppMode();
   const { strings } = useLanguage();
   const colors = ThemeColors[mode];
+  const params = useLocalSearchParams<{
+    guests?: string;
+    time?: string;
+    district?: string;
+    rating?: string;
+    cuisines?: string;
+    music?: string;
+  }>();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [guests, setGuests] = useState(2);
@@ -61,6 +69,25 @@ export default function SearchScreen() {
   const [openDropdown, setOpenDropdown] = useState<'guests' | 'time' | 'district' | null>(null);
   const [showTimeModal, setShowTimeModal] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const [cuisineFilter, setCuisineFilter] = useState<CuisineType | undefined>(undefined);
+  const [musicFilter, setMusicFilter] = useState<MusicType | undefined>(undefined);
+
+  // Apply filters from filter page params
+  useEffect(() => {
+    if (params.guests) {
+      const g = parseInt(params.guests, 10);
+      if (!isNaN(g) && g >= 1) { setGuests(g); setGuestInput(String(g)); }
+    }
+    if (params.time) setTime(params.time);
+    if (params.district) setDistrict(params.district);
+    if (params.rating) {
+      const r = parseFloat(params.rating);
+      if (!isNaN(r)) setRatingFilter(r);
+    }
+    if (params.cuisines) setCuisineFilter(params.cuisines.split(',')[0] as CuisineType);
+    if (params.music) setMusicFilter(params.music.split(',')[0] as MusicType);
+  }, [params.guests, params.time, params.district, params.rating, params.cuisines, params.music]);
 
   const peakHours = mode === 'dining' ? DINING_PEAK_HOURS : NIGHTLIFE_PEAK_HOURS;
 
@@ -112,8 +139,15 @@ export default function SearchScreen() {
     setOpenDropdown(null);
   };
 
-  const districtFilter = district !== strings.home.allDistricts ? district : undefined;
-  const venues = useVenues({ mode, searchQuery, districtFilter });
+  const districtFilterValue = district !== strings.home.allDistricts ? district : undefined;
+  const venues = useVenues({
+    mode,
+    searchQuery,
+    districtFilter: districtFilterValue,
+    ratingFilter: ratingFilter ?? undefined,
+    cuisineFilter: mode === 'dining' ? cuisineFilter : undefined,
+    musicFilter: mode === 'nightlife' ? musicFilter : undefined,
+  });
 
   const toggleDropdown = (type: 'guests' | 'time' | 'district') => {
     if (type === 'guests') setGuestInput(String(guests));
@@ -218,7 +252,10 @@ export default function SearchScreen() {
           <Pressable
             onPress={() => {
               setOpenDropdown(null);
-              router.push('/filter');
+              router.push({
+                pathname: '/filter',
+                params: { guests: String(guests), time, district },
+              });
             }}
             style={[
               styles.iconChip,
