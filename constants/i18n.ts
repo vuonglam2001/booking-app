@@ -108,6 +108,9 @@ export type Strings = {
     viewResults: string;
     min: string;
     max: string;
+    showMore: string;
+    peakHours: string;
+    allTimes: string;
   };
   bookingDetail: {
     title: string;
@@ -279,6 +282,9 @@ const en: Strings = {
     viewResults: 'View results',
     min: 'Min',
     max: 'Max',
+    showMore: 'Show more',
+    peakHours: 'Peak Hours',
+    allTimes: 'All Times',
   },
   bookingDetail: {
     title: 'Booking Details',
@@ -443,6 +449,9 @@ const vi: Strings = {
     viewResults: 'Xem kết quả',
     min: 'Tối thiểu',
     max: 'Tối đa',
+    showMore: 'Xem thêm',
+    peakHours: 'Giờ cao điểm',
+    allTimes: 'Tất cả giờ',
   },
   bookingDetail: {
     title: 'Chi tiết đặt chỗ',

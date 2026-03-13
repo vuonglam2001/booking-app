@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -22,12 +23,21 @@ import type { CuisineType, MusicType } from '@/types';
 
 const GUEST_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-const TIME_OPTIONS = [
-  '11:00', '11:30', '12:00', '12:30',
-  '17:00', '17:30', '18:00', '18:30',
-  '19:00', '19:30', '20:00', '20:30',
-  '21:00', '21:30', '22:00',
+const DINING_PEAK_HOURS = [
+  '11:30', '12:00', '12:30', '18:00',
+  '18:30', '19:00', '19:30', '20:00',
 ];
+
+const NIGHTLIFE_PEAK_HOURS = [
+  '19:00', '20:00', '21:00', '22:00',
+  '23:00', '00:00',
+];
+
+const ALL_TIME_OPTIONS: string[] = [];
+for (let h = 0; h < 24; h++) {
+  ALL_TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:00`);
+  ALL_TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:30`);
+}
 
 const CITIES = ['Ho Chi Minh', 'Ha Noi', 'Da Nang'];
 
@@ -106,6 +116,9 @@ export default function FilterScreen() {
   const [priceMin, setPriceMin] = useState('0');
   const [priceMax, setPriceMax] = useState('3000000');
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
+  const [showTimeModal, setShowTimeModal] = useState(false);
+
+  const peakHours = mode === 'dining' ? DINING_PEAK_HOURS : NIGHTLIFE_PEAK_HOURS;
 
   const toggleCuisine = (c: CuisineType) => {
     setSelectedCuisines((prev) =>
@@ -294,13 +307,13 @@ export default function FilterScreen() {
         {/* Arrival Time */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[Typography.h3, { color: colors.text }]}>{strings.filters.arrivalTime}</Text>
-          <View style={styles.chipWrap}>
-            {TIME_OPTIONS.map((t) => (
+          <View style={styles.timeGrid}>
+            {peakHours.map((t) => (
               <Pressable
                 key={t}
                 onPress={() => setSelectedTime(t)}
                 style={[
-                  styles.timeChip,
+                  styles.timeGridItem,
                   {
                     borderColor: selectedTime === t ? colors.primary : colors.border,
                     backgroundColor: selectedTime === t ? colors.primary + '10' : colors.surface,
@@ -319,7 +332,90 @@ export default function FilterScreen() {
               </Pressable>
             ))}
           </View>
+          {/* Show selected time if not in peak hours */}
+          {selectedTime && !peakHours.includes(selectedTime) && (
+            <View style={[styles.selectedTimeRow, { borderColor: colors.primary, backgroundColor: colors.primary + '10' }]}>
+              <MaterialIcons name="schedule" size={18} color={colors.primary} />
+              <Text style={[Typography.bodySm, { color: colors.primary, fontFamily: FontFamily.sansSemiBold }]}>
+                {selectedTime}
+              </Text>
+            </View>
+          )}
+          <Pressable
+            onPress={() => setShowTimeModal(true)}
+            style={[styles.showMoreBtn, { borderColor: colors.border }]}>
+            <MaterialIcons name="more-horiz" size={18} color={colors.textSecondary} />
+            <Text style={[Typography.bodySm, { color: colors.textSecondary }]}>
+              {strings.filters.showMore}
+            </Text>
+          </Pressable>
         </View>
+
+        {/* Time Picker Modal */}
+        <Modal
+          visible={showTimeModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowTimeModal(false)}>
+          <View style={styles.modalOverlay}>
+            <Pressable style={styles.modalBackdrop} onPress={() => setShowTimeModal(false)} />
+            <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  {strings.filters.arrivalTime}
+                </Text>
+                <Pressable onPress={() => setShowTimeModal(false)} hitSlop={8}>
+                  <MaterialIcons name="close" size={24} color={colors.textSecondary} />
+                </Pressable>
+              </View>
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <Text style={[styles.modalSectionLabel, { color: colors.textSecondary }]}>
+                  {strings.filters.peakHours}
+                </Text>
+                <View style={styles.modalTimeGrid}>
+                  {peakHours.map((t) => (
+                    <Pressable
+                      key={`peak-${t}`}
+                      onPress={() => { setSelectedTime(t); setShowTimeModal(false); }}
+                      style={[
+                        styles.modalTimeItem,
+                        {
+                          backgroundColor: t === selectedTime ? colors.primary : 'transparent',
+                          borderColor: t === selectedTime ? colors.primary : colors.border,
+                        },
+                      ]}>
+                      <Text style={[styles.modalTimeText, { color: t === selectedTime ? colors.primaryForeground : colors.text }]}>
+                        {t}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+
+                <Text style={[styles.modalSectionLabel, { color: colors.textSecondary, marginTop: Spacing.md }]}>
+                  {strings.filters.allTimes}
+                </Text>
+                <View style={styles.modalTimeGrid}>
+                  {ALL_TIME_OPTIONS.map((t) => (
+                    <Pressable
+                      key={`all-${t}`}
+                      onPress={() => { setSelectedTime(t); setShowTimeModal(false); }}
+                      style={[
+                        styles.modalTimeItem,
+                        {
+                          backgroundColor: t === selectedTime ? colors.primary : 'transparent',
+                          borderColor: t === selectedTime ? colors.primary : colors.border,
+                        },
+                      ]}>
+                      <Text style={[styles.modalTimeText, { color: t === selectedTime ? colors.primaryForeground : colors.text }]}>
+                        {t}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          </View>
+        </Modal>
 
         {/* Area - City + District */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -620,11 +716,90 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: Spacing.sm,
   },
-  timeChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 10,
+  timeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  timeGridItem: {
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: 12,
     borderWidth: 1.5,
+    alignItems: 'center',
+    flexBasis: '23%',
+    flexGrow: 1,
+    maxWidth: '25%',
+  },
+  selectedTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    borderWidth: 1.5,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+  },
+  showMoreBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xxl,
+    paddingHorizontal: Spacing.md,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
+  modalTitle: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  modalSectionLabel: {
+    fontFamily: FontFamily.sansMedium,
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: Spacing.sm,
+  },
+  modalTimeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  modalTimeItem: {
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    flexBasis: '30%',
+    flexGrow: 1,
+    maxWidth: '33%',
+  },
+  modalTimeText: {
+    fontFamily: FontFamily.sansMedium,
+    fontSize: 14,
+    lineHeight: 20,
   },
   cityRow: {
     flexDirection: 'row',
