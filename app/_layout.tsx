@@ -1,7 +1,7 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
 import 'react-native-reanimated';
@@ -116,6 +116,14 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="reviews"
+          options={{
+            title: strings.profile.reviews,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
           name="ai-assistant"
           options={{
             headerShown: false,
@@ -156,8 +164,12 @@ export default function RootLayout() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator size="large" />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' }}>
+        <Image
+          source={require('@/assets/images/icon.png')}
+          style={{ width: 120, height: 120 }}
+          resizeMode="contain"
+        />
       </View>
     );
   }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   Pressable,
@@ -23,6 +23,7 @@ import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { useBookings } from '@/hooks/use-bookings';
 import { useFavorites } from '@/hooks/use-favorites';
+import { getReviews } from '@/data/reviews';
 
 export default function ProfileScreen() {
   const { mode } = useAppMode();
@@ -33,12 +34,16 @@ export default function ProfileScreen() {
   const { favoriteIds } = useFavorites();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
+  const [reviewsCount, setReviewsCount] = useState(0);
 
   const languageOptions: Language[] = ['en', 'vi'];
 
+  useEffect(() => {
+    getReviews().then((r) => setReviewsCount(r.length));
+  }, []);
+
   const bookingsCount = reservations.length;
   const favoritesCount = favoriteIds.length;
-  const reviewsCount = 8;
 
   const getInitials = (name: string) => {
     return name
@@ -52,7 +57,7 @@ export default function ProfileScreen() {
   const stats = [
     { label: strings.profile.bookings, value: bookingsCount, onPress: () => router.push('/(tabs)/bookings') },
     { label: strings.profile.favorites, value: favoritesCount, onPress: () => router.push('/favorites') },
-    { label: strings.profile.reviews, value: reviewsCount, onPress: undefined as (() => void) | undefined },
+    { label: strings.profile.reviews, value: reviewsCount, onPress: () => router.push('/reviews') },
   ];
 
   return (
@@ -151,7 +156,7 @@ export default function ProfileScreen() {
 
           {/* Language */}
           <Pressable
-            style={[styles.menuItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}
+            style={styles.menuItem}
             onPress={() => setLanguageModalVisible(true)}>
             <View style={styles.menuLeft}>
               <MaterialIcons name="language" size={22} color={colors.textSecondary} />
@@ -165,17 +170,6 @@ export default function ProfileScreen() {
               </Text>
               <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
             </View>
-          </Pressable>
-
-          {/* Account Settings */}
-          <Pressable style={styles.menuItem} onPress={() => {}}>
-            <View style={styles.menuLeft}>
-              <MaterialIcons name="settings" size={22} color={colors.textSecondary} />
-              <Text style={[Typography.body, { color: colors.text, marginLeft: Spacing.md }]}>
-                {strings.profile.accountSettings}
-              </Text>
-            </View>
-            <MaterialIcons name="chevron-right" size={20} color={colors.textTertiary} />
           </Pressable>
         </View>
 
