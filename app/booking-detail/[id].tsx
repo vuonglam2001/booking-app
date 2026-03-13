@@ -1,6 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -39,6 +42,15 @@ export default function BookingDetailScreen() {
   const [comment, setComment] = useState('');
   const [existingReview, setExistingReview] = useState<BookingReview | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    const event = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const sub = Keyboard.addListener(event, () => {
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
+    });
+    return () => sub.remove();
+  }, []);
 
   const loadReview = useCallback(async () => {
     if (!id) return;
@@ -88,9 +100,15 @@ export default function BookingDetailScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
       <ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled">
         {/* Venue Image */}
         {venue && (
           <Image
@@ -250,6 +268,7 @@ export default function BookingDetailScreen() {
 
         <View style={{ height: Spacing.xxl }} />
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

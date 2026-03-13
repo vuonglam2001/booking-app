@@ -12,6 +12,11 @@ export async function getReviewByBookingId(bookingId: string): Promise<BookingRe
   return reviews.find((r) => r.bookingId === bookingId) ?? null;
 }
 
+export async function getReviewsByVenueId(venueId: string): Promise<BookingReview[]> {
+  const reviews = await getReviews();
+  return reviews.filter((r) => r.restaurantId === venueId);
+}
+
 export async function saveReview(review: BookingReview): Promise<void> {
   const reviews = await getReviews();
   reviews.push(review);

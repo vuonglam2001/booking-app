@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -26,8 +26,9 @@ import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { useFavorites } from '@/hooks/use-favorites';
 import { getVenueById } from '@/data';
+import { getReviewsByVenueId } from '@/data/reviews';
 import { formatTime, shareVenue } from '@/utils/format';
-import type { Review } from '@/types';
+import type { BookingReview, Review } from '@/types';
 
 const MOCK_REVIEWS: Review[] = [
   {
@@ -66,8 +67,19 @@ export default function VenueDetailScreen() {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [userReviews, setUserReviews] = useState<BookingReview[]>([]);
   const flatListRef = useRef<FlatList>(null);
   const screenWidth = Dimensions.get('window').width;
+
+  const loadUserReviews = useCallback(async () => {
+    if (!id) return;
+    const reviews = await getReviewsByVenueId(id);
+    setUserReviews(reviews);
+  }, [id]);
+
+  useEffect(() => {
+    loadUserReviews();
+  }, [loadUserReviews]);
 
   if (!venue) {
     return (
@@ -265,6 +277,34 @@ export default function VenueDetailScreen() {
           <Text style={[Typography.h3, { color: colors.text }]}>
             {strings.venue.reviews}
           </Text>
+          {userReviews.map((review) => (
+            <View
+              key={`user-${review.bookingId}`}
+              style={[
+                styles.reviewCard,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}>
+              <View style={styles.reviewHeader}>
+                <Text
+                  style={[
+                    Typography.bodySm,
+                    { color: colors.text, fontWeight: '600' },
+                  ]}>
+                  {strings.bookingDetail.yourReview}
+                </Text>
+                <View style={styles.reviewStars}>{renderStars(review.rating)}</View>
+              </View>
+              {review.comment ? (
+                <Text
+                  style={[
+                    Typography.bodySm,
+                    { color: colors.textSecondary, marginTop: Spacing.xs },
+                  ]}>
+                  {review.comment}
+                </Text>
+              ) : null}
+            </View>
+          ))}
           {MOCK_REVIEWS.map((review) => (
             <View
               key={review.id}

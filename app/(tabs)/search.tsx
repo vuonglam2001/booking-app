@@ -232,38 +232,52 @@ export default function SearchScreen() {
       {/* Dropdown Panels */}
       {openDropdown === 'guests' && (
         <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dropdownScroll}>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((g) => (
-              <Pressable
-                key={g}
-                onPress={() => { setGuests(g); setGuestInput(String(g)); setOpenDropdown(null); }}
-                style={[
-                  styles.dropdownItem,
-                  {
-                    backgroundColor: g === guests ? colors.primary : 'transparent',
-                    borderColor: g === guests ? colors.primary : colors.border,
-                  },
-                ]}>
-                <Text style={[styles.dropdownText, { color: g === guests ? colors.primaryForeground : colors.text }]}>
-                  {g}
-                </Text>
-              </Pressable>
-            ))}
-            {/* Custom input */}
-            <View style={styles.guestInputWrap}>
+          <View style={styles.guestPickerRow}>
+            <Pressable
+              onPress={() => {
+                const next = Math.max(1, guests - 1);
+                setGuests(next);
+                setGuestInput(String(next));
+              }}
+              style={[
+                styles.guestBtn,
+                {
+                  backgroundColor: guests <= 1 ? colors.inputBackground : colors.primary + '15',
+                  borderColor: guests <= 1 ? colors.border : colors.primary,
+                },
+              ]}>
+              <MaterialIcons name="remove" size={20} color={guests <= 1 ? colors.textTertiary : colors.primary} />
+            </Pressable>
+
+            <View style={styles.guestValueWrap}>
               <TextInput
-                style={[styles.guestInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.inputBackground }]}
+                style={[styles.guestValueInput, { color: colors.text }]}
                 value={guestInput}
                 onChangeText={handleGuestInputChange}
                 onSubmitEditing={handleGuestInputSubmit}
+                onBlur={handleGuestInputSubmit}
                 keyboardType="number-pad"
                 maxLength={2}
                 selectTextOnFocus
-                placeholder="#"
-                placeholderTextColor={colors.inputPlaceholder}
               />
+              <Text style={[styles.guestLabel, { color: colors.textSecondary }]}>
+                {guests === 1 ? strings.common.guest : strings.common.guests}
+              </Text>
             </View>
-          </ScrollView>
+
+            <Pressable
+              onPress={() => {
+                const next = Math.min(99, guests + 1);
+                setGuests(next);
+                setGuestInput(String(next));
+              }}
+              style={[
+                styles.guestBtn,
+                { backgroundColor: colors.primary + '15', borderColor: colors.primary },
+              ]}>
+              <MaterialIcons name="add" size={20} color={colors.primary} />
+            </Pressable>
+          </View>
         </View>
       )}
 
@@ -455,18 +469,39 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     marginBottom: Spacing.sm,
   },
-  guestInputWrap: {
+  guestPickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    gap: Spacing.lg,
+  },
+  guestBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  guestInput: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: 14,
-    lineHeight: 20,
+  guestValueWrap: {
+    alignItems: 'center',
+    minWidth: 60,
+  },
+  guestValueInput: {
+    fontFamily: FontFamily.displayBold,
+    fontSize: 28,
+    lineHeight: 36,
     textAlign: 'center',
-    width: 48,
-    paddingVertical: Spacing.sm,
-    borderRadius: 20,
-    borderWidth: 1,
+    padding: 0,
+    minWidth: 50,
+  },
+  guestLabel: {
+    fontFamily: FontFamily.sansRegular,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: 2,
   },
   dropdownScroll: {
     paddingHorizontal: Spacing.sm,
