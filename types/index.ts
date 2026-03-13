@@ -76,6 +76,7 @@ export interface Reservation {
   time: string;
   guests: number;
   specialRequests?: string;
+  phoneNumber?: string;
   status: ReservationStatus;
   cancelReason?: string;
   createdAt: string;

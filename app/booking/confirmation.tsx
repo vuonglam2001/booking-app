@@ -131,8 +131,16 @@ export default function ConfirmationScreen() {
             label={strings.confirmation.guests}
             value={`${reservation.guests}`}
             colors={colors}
-            isLast
+            isLast={!reservation.phoneNumber}
           />
+          {reservation.phoneNumber && (
+            <DetailRow
+              label={strings.confirmation.phone}
+              value={reservation.phoneNumber}
+              colors={colors}
+              isLast
+            />
+          )}
         </View>
 
         {/* Buttons */}

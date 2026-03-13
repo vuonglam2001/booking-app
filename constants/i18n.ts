@@ -42,6 +42,8 @@ export type Strings = {
     guests: string;
     specialRequests: string;
     specialRequestsPlaceholder: string;
+    phoneNumber: string;
+    phoneNumberHint: string;
     confirm: string;
     unavailable: string;
   };
@@ -53,6 +55,7 @@ export type Strings = {
     date: string;
     time: string;
     guests: string;
+    phone: string;
     viewBookings: string;
     backHome: string;
   };
@@ -216,6 +219,8 @@ const en: Strings = {
     guests: 'Number of Guests',
     specialRequests: 'Special Requests',
     specialRequestsPlaceholder: 'Any dietary requirements or preferences...',
+    phoneNumber: 'Phone number (optional)',
+    phoneNumberHint: "We'll only use this if the restaurant needs to contact you",
     confirm: 'Confirm Booking',
     unavailable: 'Unavailable',
   },
@@ -227,6 +232,7 @@ const en: Strings = {
     date: 'Date',
     time: 'Time',
     guests: 'Guests',
+    phone: 'Phone',
     viewBookings: 'View My Bookings',
     backHome: 'Back to Home',
   },
@@ -383,6 +389,8 @@ const vi: Strings = {
     guests: 'Số khách',
     specialRequests: 'Yêu cầu đặc biệt',
     specialRequestsPlaceholder: 'Yêu cầu về chế độ ăn hoặc sở thích...',
+    phoneNumber: 'Số điện thoại (tùy chọn)',
+    phoneNumberHint: 'Chúng tôi chỉ sử dụng khi nhà hàng cần liên hệ bạn',
     confirm: 'Xác nhận đặt chỗ',
     unavailable: 'Không khả dụng',
   },
@@ -394,6 +402,7 @@ const vi: Strings = {
     date: 'Ngày',
     time: 'Giờ',
     guests: 'Số khách',
+    phone: 'Điện thoại',
     viewBookings: 'Xem đặt chỗ của tôi',
     backHome: 'Về trang chủ',
   },

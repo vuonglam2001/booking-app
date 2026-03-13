@@ -179,6 +179,17 @@ export default function BookingDetailScreen() {
               value={`${reservation.guests} ${reservation.guests === 1 ? strings.common.guest : strings.common.guests}`}
               colors={colors}
             />
+            {reservation.phoneNumber && (
+              <>
+                <View style={[styles.divider, { backgroundColor: colors.border }]} />
+                <InfoRow
+                  icon="phone"
+                  label={strings.confirmation.phone}
+                  value={reservation.phoneNumber}
+                  colors={colors}
+                />
+              </>
+            )}
             {venue && (
               <>
                 <View style={[styles.divider, { backgroundColor: colors.border }]} />

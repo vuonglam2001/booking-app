@@ -96,6 +96,7 @@ export default function BookingScreen() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [guests, setGuests] = useState(2);
   const [specialRequests, setSpecialRequests] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -137,6 +138,7 @@ export default function BookingScreen() {
       time: selectedTime,
       guests,
       specialRequests: specialRequests.trim() || undefined,
+      phoneNumber: phoneNumber.trim() || undefined,
       status: 'confirmed',
       createdAt: new Date().toISOString(),
     };
@@ -261,6 +263,33 @@ export default function BookingScreen() {
           />
         </View>
 
+        {/* Phone Number */}
+        <View style={styles.section}>
+          <Text style={[Typography.h3, { color: colors.text }]}>
+            {strings.booking.phoneNumber}
+          </Text>
+          <TextInput
+            style={[
+              styles.phoneInput,
+              Typography.body,
+              {
+                backgroundColor: colors.inputBackground,
+                color: colors.text,
+                borderColor: colors.border,
+              },
+            ]}
+            value={phoneNumber}
+            onChangeText={(t) => setPhoneNumber(t.replace(/[^0-9+\- ]/g, ''))}
+            placeholder="+84 xxx xxx xxx"
+            placeholderTextColor={colors.inputPlaceholder}
+            keyboardType="phone-pad"
+            maxLength={15}
+          />
+          <Text style={[Typography.caption, { color: colors.textTertiary, marginTop: 4 }]}>
+            {strings.booking.phoneNumberHint}
+          </Text>
+        </View>
+
         {/* Bottom spacer */}
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -332,6 +361,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     marginTop: Spacing.sm,
     minHeight: 100,
+  },
+  phoneInput: {
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.md,
+    marginTop: Spacing.sm,
   },
   bottomBar: {
     position: 'absolute',
