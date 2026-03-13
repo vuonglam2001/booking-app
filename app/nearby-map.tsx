@@ -263,8 +263,8 @@ export default function NearbyMapScreen() {
         showsCompass={false}
         onRegionChangeComplete={setRegion}
         onPress={handleMapPress}
-        customMapStyle={isDark && !goongTileUrl ? DARK_MAP_STYLE : undefined}
-        mapType={goongTileUrl ? "none" : "standard"}
+        customMapStyle={isDark ? DARK_MAP_STYLE : undefined}
+        mapType="standard"
       >
         {goongTileUrl && (
           <UrlTile
@@ -276,14 +276,18 @@ export default function NearbyMapScreen() {
         )}
 
         {visibleVenues.map((venue) => (
-            <Marker
-              key={venue.id}
-              coordinate={venue.coordinates}
-              onPress={() => handleMarkerPress(venue)}
-              image={MARKER_IMAGE}
-              anchor={{ x: 0.5, y: 0.9 }}
-              tracksViewChanges={false}
-            />
+          <Marker
+            key={venue.id}
+            coordinate={venue.coordinates}
+            onPress={() => handleMarkerPress(venue)}
+            image={MARKER_IMAGE}
+            anchor={{ x: 0.5, y: 0.9 }}
+            style={{
+              width: 20,
+              height: 58,
+            }}
+            tracksViewChanges={false}
+          />
         ))}
       </MapView>
 
@@ -357,7 +361,10 @@ export default function NearbyMapScreen() {
             keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
               <Pressable
-                style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
+                style={[
+                  styles.searchResultItem,
+                  { borderBottomColor: colors.border },
+                ]}
                 onPress={() => handleSearchSelect(item)}
               >
                 <MaterialIcons
@@ -374,7 +381,10 @@ export default function NearbyMapScreen() {
                     {item.name}
                   </Text>
                   <Text
-                    style={[styles.searchResultAddr, { color: colors.textSecondary }]}
+                    style={[
+                      styles.searchResultAddr,
+                      { color: colors.textSecondary },
+                    ]}
                     numberOfLines={1}
                   >
                     {item.address}
@@ -382,7 +392,9 @@ export default function NearbyMapScreen() {
                 </View>
                 <View style={styles.searchResultMeta}>
                   <MaterialIcons name="star" size={12} color="#FBBF24" />
-                  <Text style={[styles.searchResultRating, { color: colors.text }]}>
+                  <Text
+                    style={[styles.searchResultRating, { color: colors.text }]}
+                  >
                     {item.rating}
                   </Text>
                 </View>
@@ -705,6 +717,20 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 12,
     backgroundColor: "#2A2A3C",
+  },
+  markerWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    width: 52,
+    height: 58,
+  },
+  markerImage: {
+    width: 44,
+    height: 50,
+  },
+  markerImageSelected: {
+    width: 52,
+    height: 58,
   },
 });
 

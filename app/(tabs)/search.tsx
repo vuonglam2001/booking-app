@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   FlatList,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -26,11 +27,15 @@ import { getVenuesByMode } from '@/data';
 import type { Venue } from '@/types';
 
 // Full 24h time slots, every 30 minutes
-const TIME_OPTIONS: string[] = [];
+const ALL_TIME_OPTIONS: string[] = [];
 for (let h = 0; h < 24; h++) {
-  TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:00`);
-  TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:30`);
+  ALL_TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:00`);
+  ALL_TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:30`);
 }
+
+// Peak hours by mode
+const DINING_PEAK_HOURS = ['11:30', '12:00', '12:30', '18:00', '18:30', '19:00', '19:30', '20:00'];
+const NIGHTLIFE_PEAK_HOURS = ['19:00', '20:00', '21:00', '22:00', '23:00', '00:00'];
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -54,7 +59,10 @@ export default function SearchScreen() {
   const [time, setTime] = useState('19:00');
   const [district, setDistrict] = useState(strings.home.allDistricts);
   const [openDropdown, setOpenDropdown] = useState<'guests' | 'time' | 'district' | null>(null);
+  const [showTimeModal, setShowTimeModal] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  const peakHours = mode === 'dining' ? DINING_PEAK_HOURS : NIGHTLIFE_PEAK_HOURS;
 
   // Get user location
   useEffect(() => {
@@ -262,7 +270,7 @@ export default function SearchScreen() {
       {openDropdown === 'time' && (
         <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dropdownScroll}>
-            {TIME_OPTIONS.map((t) => (
+            {peakHours.map((t) => (
               <Pressable
                 key={t}
                 onPress={() => { setTime(t); setOpenDropdown(null); }}
@@ -278,9 +286,85 @@ export default function SearchScreen() {
                 </Text>
               </Pressable>
             ))}
+            {/* More time button */}
+            <Pressable
+              onPress={() => { setOpenDropdown(null); setShowTimeModal(true); }}
+              style={[styles.moreTimeBtn, { borderColor: colors.border }]}>
+              <MaterialIcons name="more-horiz" size={18} color={colors.textSecondary} />
+              <Text style={[styles.moreTimeText, { color: colors.textSecondary }]}>More</Text>
+            </Pressable>
           </ScrollView>
         </View>
       )}
+
+      {/* Time Picker Modal */}
+      <Modal
+        visible={showTimeModal}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowTimeModal(false)}>
+        <View style={styles.modalOverlay}>
+          <Pressable style={styles.modalBackdrop} onPress={() => setShowTimeModal(false)} />
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>
+                {strings.booking.selectTime}
+              </Text>
+              <Pressable onPress={() => setShowTimeModal(false)} hitSlop={8}>
+                <MaterialIcons name="close" size={24} color={colors.textSecondary} />
+              </Pressable>
+            </View>
+
+            {/* Peak hours section */}
+            <Text style={[styles.modalSectionLabel, { color: colors.textSecondary }]}>
+              {mode === 'dining' ? 'Peak Hours' : 'Popular Hours'}
+            </Text>
+            <View style={styles.modalTimeGrid}>
+              {peakHours.map((t) => (
+                <Pressable
+                  key={`peak-${t}`}
+                  onPress={() => { setTime(t); setShowTimeModal(false); }}
+                  style={[
+                    styles.modalTimeItem,
+                    {
+                      backgroundColor: t === time ? colors.primary : 'transparent',
+                      borderColor: t === time ? colors.primary : colors.border,
+                    },
+                  ]}>
+                  <Text style={[styles.modalTimeText, { color: t === time ? colors.primaryForeground : colors.text }]}>
+                    {t}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+
+            {/* All times section */}
+            <Text style={[styles.modalSectionLabel, { color: colors.textSecondary, marginTop: Spacing.md }]}>
+              All Times
+            </Text>
+            <ScrollView style={styles.modalScrollArea} showsVerticalScrollIndicator={false}>
+              <View style={styles.modalTimeGrid}>
+                {ALL_TIME_OPTIONS.map((t) => (
+                  <Pressable
+                    key={`all-${t}`}
+                    onPress={() => { setTime(t); setShowTimeModal(false); }}
+                    style={[
+                      styles.modalTimeItem,
+                      {
+                        backgroundColor: t === time ? colors.primary : 'transparent',
+                        borderColor: t === time ? colors.primary : colors.border,
+                      },
+                    ]}>
+                    <Text style={[styles.modalTimeText, { color: t === time ? colors.primaryForeground : colors.text }]}>
+                      {t}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
 
       {openDropdown === 'district' && (
         <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -404,5 +488,74 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.xxl,
+  },
+  moreTimeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+  },
+  moreTimeText: {
+    fontFamily: FontFamily.sansMedium,
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  modalContent: {
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xxl,
+    paddingHorizontal: Spacing.md,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing.md,
+  },
+  modalTitle: {
+    fontFamily: FontFamily.sansSemiBold,
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  modalSectionLabel: {
+    fontFamily: FontFamily.sansMedium,
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: Spacing.sm,
+  },
+  modalTimeGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  modalScrollArea: {
+    flex: 1,
+  },
+  modalTimeItem: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm + 2,
+    borderRadius: 20,
+    borderWidth: 1,
+    minWidth: 70,
+    alignItems: 'center',
+  },
+  modalTimeText: {
+    fontFamily: FontFamily.sansMedium,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

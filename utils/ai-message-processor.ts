@@ -76,8 +76,19 @@ function parseTime(message: string): string | null {
     const match = lower.match(pattern);
     if (match) {
       let hours = parseInt(match[1], 10);
-      const minutes = match[2] && /^\d+$/.test(match[2]) ? parseInt(match[2], 10) : 0;
-      const ampm = (match[3] ?? '').toLowerCase();
+      // Find minutes: first purely numeric group after hours
+      let minutes = 0;
+      // Find am/pm: first group that matches am/pm/giờ/h
+      let ampm = '';
+      for (let g = 2; g < match.length; g++) {
+        if (!match[g]) continue;
+        const val = match[g].toLowerCase();
+        if (/^\d+$/.test(val) && minutes === 0) {
+          minutes = parseInt(val, 10);
+        } else if (/^(am|pm|giờ|h)$/i.test(val) && !ampm) {
+          ampm = val;
+        }
+      }
 
       if (ampm === 'pm' && hours < 12) hours += 12;
       if (ampm === 'am' && hours === 12) hours = 0;

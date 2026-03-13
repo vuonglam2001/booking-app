@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
+  Dimensions,
+  FlatList,
   Image,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -61,6 +64,10 @@ export default function VenueDetailScreen() {
   const venue = getVenueById(id);
   const favorited = venue ? isFavorite(venue.id) : false;
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
+  const screenWidth = Dimensions.get('window').width;
 
   if (!venue) {
     return (
@@ -226,12 +233,18 @@ export default function VenueDetailScreen() {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.photosScroll}>
               {venue.photos.map((photo, index) => (
-                <Image
+                <Pressable
                   key={index}
-                  source={{ uri: photo }}
-                  style={styles.photoThumbnail}
-                  resizeMode="cover"
-                />
+                  onPress={() => {
+                    setSelectedImageIndex(index);
+                    setImageViewerVisible(true);
+                  }}>
+                  <Image
+                    source={{ uri: photo }}
+                    style={styles.photoThumbnail}
+                    resizeMode="cover"
+                  />
+                </Pressable>
               ))}
             </ScrollView>
           </View>
@@ -273,6 +286,59 @@ export default function VenueDetailScreen() {
         {/* Bottom spacer for sticky bar */}
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      {/* Fullscreen Image Viewer */}
+      <Modal
+        visible={imageViewerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setImageViewerVisible(false)}>
+        <View style={styles.imageViewerOverlay}>
+          {/* Close button */}
+          <Pressable
+            onPress={() => setImageViewerVisible(false)}
+            style={styles.imageViewerClose}
+            hitSlop={12}>
+            <IconSymbol name="xmark" size={22} color="#FFFFFF" />
+          </Pressable>
+
+          {/* Counter */}
+          <View style={styles.imageViewerCounter}>
+            <Text style={styles.imageViewerCounterText}>
+              {selectedImageIndex + 1} / {venue.photos.length}
+            </Text>
+          </View>
+
+          {/* Image carousel */}
+          <FlatList
+            ref={flatListRef}
+            data={venue.photos}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={selectedImageIndex}
+            getItemLayout={(_, index) => ({
+              length: screenWidth,
+              offset: screenWidth * index,
+              index,
+            })}
+            onMomentumScrollEnd={(e) => {
+              const idx = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+              setSelectedImageIndex(idx);
+            }}
+            keyExtractor={(_, index) => `viewer-${index}`}
+            renderItem={({ item }) => (
+              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
+                <Image
+                  source={{ uri: item }}
+                  style={{ width: screenWidth, height: screenWidth * 0.75 }}
+                  resizeMode="contain"
+                />
+              </View>
+            )}
+          />
+        </View>
+      </Modal>
 
       {/* Sticky Bottom Bar */}
       <View
@@ -389,5 +455,35 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     paddingBottom: Spacing.lg,
     borderTopWidth: 1,
+  },
+  imageViewerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    justifyContent: 'center',
+  },
+  imageViewerClose: {
+    position: 'absolute',
+    top: 52,
+    right: Spacing.md,
+    zIndex: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  imageViewerCounter: {
+    position: 'absolute',
+    top: 58,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    alignItems: 'center',
+  },
+  imageViewerCounterText: {
+    color: '#FFFFFF',
+    fontFamily: 'Geist-Medium',
+    fontSize: 15,
   },
 });
