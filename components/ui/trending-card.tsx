@@ -10,6 +10,7 @@ import Animated, {
 import { Spacing } from '@/constants/spacing';
 import { FontFamily } from '@/constants/typography';
 import { formatPriceRange } from '@/utils/format';
+import { useFavorites } from '@/hooks/use-favorites';
 import type { Venue } from '@/types';
 
 interface TrendingCardProps {
@@ -21,6 +22,8 @@ interface TrendingCardProps {
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export function TrendingCard({ venue, onPress, width = 200 }: TrendingCardProps) {
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorited = isFavorite(venue.id);
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -49,6 +52,17 @@ export function TrendingCard({ venue, onPress, width = 200 }: TrendingCardProps)
       />
       {/* Dark gradient overlay */}
       <View style={styles.gradient} />
+      {/* Heart button */}
+      <Pressable
+        onPress={(e) => { e.stopPropagation(); toggleFavorite(venue.id); }}
+        style={styles.heartBtn}
+        hitSlop={8}>
+        <MaterialIcons
+          name={favorited ? 'favorite' : 'favorite-border'}
+          size={20}
+          color={favorited ? '#EF4444' : 'rgba(255,255,255,0.9)'}
+        />
+      </Pressable>
       {/* Content overlay */}
       <View style={styles.overlay}>
         <Text style={styles.name} numberOfLines={1}>
@@ -89,7 +103,17 @@ const styles = StyleSheet.create({
   gradient: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.35)',
-    // A simple gradient effect using two overlapping views
+  },
+  heartBtn: {
+    position: 'absolute',
+    top: Spacing.sm,
+    right: Spacing.sm,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   overlay: {
     position: 'absolute',

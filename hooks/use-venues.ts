@@ -10,6 +10,7 @@ interface UseVenuesOptions {
   musicFilter?: MusicType;
   priceFilter?: PriceLevel;
   ratingFilter?: number;
+  districtFilter?: string;
 }
 
 export function useVenues({
@@ -19,6 +20,7 @@ export function useVenues({
   musicFilter,
   priceFilter,
   ratingFilter,
+  districtFilter,
 }: UseVenuesOptions): Venue[] {
   const venues = useMemo(() => getVenuesByMode(mode), [mode]);
 
@@ -34,6 +36,10 @@ export function useVenues({
           v.tags.some((t) => t.toLowerCase().includes(q)) ||
           v.district.toLowerCase().includes(q)
       );
+    }
+
+    if (districtFilter) {
+      filtered = filtered.filter((v) => v.district === districtFilter);
     }
 
     if (cuisineFilter) {
@@ -53,5 +59,5 @@ export function useVenues({
     }
 
     return filtered;
-  }, [venues, searchQuery, cuisineFilter, musicFilter, priceFilter, ratingFilter]);
+  }, [venues, searchQuery, districtFilter, cuisineFilter, musicFilter, priceFilter, ratingFilter]);
 }

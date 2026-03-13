@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import { AppModeProvider } from '@/contexts/app-mode-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import { BookingsProvider } from '@/contexts/bookings-context';
+import { FavoritesProvider } from '@/contexts/favorites-context';
 import { LanguageProvider } from '@/contexts/language-context';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
@@ -91,6 +92,21 @@ function RootNavigator() {
           }}
         />
         <Stack.Screen
+          name="nearby-map"
+          options={{
+            headerShown: false,
+            gestureEnabled: true,
+          }}
+        />
+        <Stack.Screen
+          name="favorites"
+          options={{
+            title: strings.profile.savedVenues,
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
           name="ai-assistant"
           options={{
             headerShown: false,
@@ -143,7 +159,9 @@ export default function RootLayout() {
         <AppModeProvider>
           <AuthProvider>
             <BookingsProvider>
-              <RootNavigator />
+              <FavoritesProvider>
+                <RootNavigator />
+              </FavoritesProvider>
             </BookingsProvider>
           </AuthProvider>
         </AppModeProvider>

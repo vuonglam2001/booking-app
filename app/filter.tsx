@@ -15,6 +15,7 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { Typography, FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
 import type { CuisineType, MusicType } from '@/types';
 
 // --- Data ---
@@ -90,12 +91,13 @@ const RATING_OPTIONS = [
 
 export default function FilterScreen() {
   const { mode } = useAppMode();
+  const { strings } = useLanguage();
   const colors = ThemeColors[mode];
 
   const [guests, setGuests] = useState(2);
   const [selectedTime, setSelectedTime] = useState('19:00');
   const [selectedCity, setSelectedCity] = useState('Ho Chi Minh');
-  const [selectedDistrict, setSelectedDistrict] = useState('All Districts');
+  const [selectedDistrict, setSelectedDistrict] = useState(strings.filters.allDistricts);
   const [kidFriendly, setKidFriendly] = useState(false);
   const [selectedCuisines, setSelectedCuisines] = useState<CuisineType[]>([]);
   const [selectedMusic, setSelectedMusic] = useState<MusicType[]>([]);
@@ -119,7 +121,7 @@ export default function FilterScreen() {
     setGuests(2);
     setSelectedTime('19:00');
     setSelectedCity('Ho Chi Minh');
-    setSelectedDistrict('All Districts');
+    setSelectedDistrict(strings.filters.allDistricts);
     setKidFriendly(false);
     setSelectedCuisines([]);
     setSelectedMusic([]);
@@ -138,7 +140,11 @@ export default function FilterScreen() {
     }
   };
 
-  const districts = DISTRICTS[selectedCity] ?? [];
+  const districts = (DISTRICTS[selectedCity] ?? []).map((d) =>
+    d.name === 'All Districts'
+      ? { name: strings.filters.allDistricts, description: strings.filters.allAreas }
+      : d,
+  );
 
   return (
     <SafeAreaView style={[styles.screen, { backgroundColor: colors.background }]}>
@@ -148,7 +154,7 @@ export default function FilterScreen() {
           <MaterialIcons name="close" size={26} color={colors.text} />
         </Pressable>
         <Text style={[Typography.h3, { color: colors.text, flex: 1, textAlign: 'center' }]}>
-          Filters
+          {strings.filters.title}
         </Text>
         <View style={{ width: 26 }} />
       </View>
@@ -159,7 +165,7 @@ export default function FilterScreen() {
 
         {/* Guests */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[Typography.h3, { color: colors.text }]}>Number of guests?</Text>
+          <Text style={[Typography.h3, { color: colors.text }]}>{strings.filters.numberOfGuests}</Text>
           <View style={styles.grid}>
             {GUEST_OPTIONS.map((n) => (
               <Pressable
@@ -198,7 +204,7 @@ export default function FilterScreen() {
               style={[styles.checkRow, { borderTopColor: colors.border }]}>
               <MaterialIcons name="child-care" size={20} color={colors.textSecondary} />
               <Text style={[Typography.bodySm, { color: colors.text, flex: 1 }]}>
-                Kid-friendly restaurants
+                {strings.filters.kidFriendly}
               </Text>
               <View
                 style={[
@@ -218,7 +224,7 @@ export default function FilterScreen() {
 
         {/* Arrival Time */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[Typography.h3, { color: colors.text }]}>Arrival time?</Text>
+          <Text style={[Typography.h3, { color: colors.text }]}>{strings.filters.arrivalTime}</Text>
           <View style={styles.chipWrap}>
             {TIME_OPTIONS.map((t) => (
               <Pressable
@@ -248,11 +254,11 @@ export default function FilterScreen() {
 
         {/* Area - City + District */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[Typography.h3, { color: colors.text }]}>Area?</Text>
+          <Text style={[Typography.h3, { color: colors.text }]}>{strings.filters.area}</Text>
 
           {/* City selector */}
           <Text style={[Typography.bodySm, { color: colors.textSecondary, fontFamily: FontFamily.sansMedium }]}>
-            City
+            {strings.filters.city}
           </Text>
           <View style={styles.cityRow}>
             {CITIES.map((city) => {
@@ -262,7 +268,7 @@ export default function FilterScreen() {
                   key={city}
                   onPress={() => {
                     setSelectedCity(city);
-                    setSelectedDistrict('All Districts');
+                    setSelectedDistrict(strings.filters.allDistricts);
                   }}
                   style={[
                     styles.cityCard,
@@ -294,7 +300,7 @@ export default function FilterScreen() {
 
           {/* District selector */}
           <Text style={[Typography.bodySm, { color: colors.textSecondary, fontFamily: FontFamily.sansMedium }]}>
-            District
+            {strings.filters.district}
           </Text>
           <View style={styles.districtGrid}>
             {districts.map((d) => {
@@ -335,7 +341,7 @@ export default function FilterScreen() {
         {/* Category (Cuisine / Music) */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[Typography.h3, { color: colors.text }]}>
-            {mode === 'dining' ? 'Cuisine' : 'Music'}
+            {mode === 'dining' ? strings.filters.cuisine : strings.filters.music}
           </Text>
           <View style={styles.categoryGrid}>
             {categoryOptions.map((opt) => {
@@ -369,7 +375,7 @@ export default function FilterScreen() {
 
         {/* Rating */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[Typography.h3, { color: colors.text }]}>Rating</Text>
+          <Text style={[Typography.h3, { color: colors.text }]}>{strings.filters.rating}</Text>
           <View style={styles.chipWrap}>
             {RATING_OPTIONS.map((r) => {
               const isSelected = selectedRating === r.value;
@@ -407,13 +413,13 @@ export default function FilterScreen() {
 
         {/* Price Range */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[Typography.h3, { color: colors.text }]}>Price Range</Text>
+          <Text style={[Typography.h3, { color: colors.text }]}>{strings.filters.price}</Text>
           <Text style={[Typography.caption, { color: colors.textSecondary }]}>
-            Cost per person (VND)
+            {strings.filters.pricePerPerson}
           </Text>
           <View style={styles.priceRow}>
             <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
-              <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>Min</Text>
+              <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>{strings.filters.min}</Text>
               <TextInput
                 style={[styles.priceValue, { color: colors.text }]}
                 value={formatVND(parseInt(priceMin || '0', 10))}
@@ -426,7 +432,7 @@ export default function FilterScreen() {
             </View>
             <Text style={[Typography.body, { color: colors.textTertiary }]}>—</Text>
             <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
-              <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>Max</Text>
+              <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>{strings.filters.max}</Text>
               <TextInput
                 style={[styles.priceValue, { color: colors.text }]}
                 value={formatVND(parseInt(priceMax || '0', 10))}
@@ -445,7 +451,7 @@ export default function FilterScreen() {
       <View style={[styles.bottomBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <Pressable onPress={clearAll} style={styles.clearButton}>
           <Text style={[Typography.button, { color: colors.text, textDecorationLine: 'underline' }]}>
-            Clear all
+            {strings.filters.clearAll}
           </Text>
         </Pressable>
         <Pressable
@@ -455,7 +461,7 @@ export default function FilterScreen() {
           }}
           style={[styles.resultsButton, { backgroundColor: colors.primary }]}>
           <Text style={[Typography.button, { color: colors.primaryForeground }]}>
-            View results
+            {strings.filters.viewResults}
           </Text>
         </Pressable>
       </View>

@@ -21,6 +21,7 @@ import { Typography } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
+import { useFavorites } from '@/hooks/use-favorites';
 import { getVenueById } from '@/data';
 import { formatTime } from '@/utils/format';
 import type { Review } from '@/types';
@@ -55,8 +56,10 @@ export default function VenueDetailScreen() {
   const { strings } = useLanguage();
   const colors = ThemeColors[mode];
   const { isAuthenticated } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
   const venue = getVenueById(id);
+  const favorited = venue ? isFavorite(venue.id) : false;
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   if (!venue) {
@@ -114,6 +117,18 @@ export default function VenueDetailScreen() {
               { backgroundColor: 'rgba(0,0,0,0.4)' },
             ]}>
             <IconSymbol name="arrow.left" size={22} color="#FFFFFF" />
+          </Pressable>
+          <Pressable
+            onPress={() => toggleFavorite(venue.id)}
+            style={[
+              styles.heartButton,
+              { backgroundColor: 'rgba(0,0,0,0.4)' },
+            ]}>
+            <IconSymbol
+              name={favorited ? 'heart.fill' : 'heart'}
+              size={22}
+              color={favorited ? '#EF4444' : '#FFFFFF'}
+            />
           </Pressable>
         </View>
 
@@ -298,6 +313,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 52,
     left: Spacing.md,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heartButton: {
+    position: 'absolute',
+    top: 52,
+    right: Spacing.md,
     width: 40,
     height: 40,
     borderRadius: 20,

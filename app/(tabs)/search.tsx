@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   FlatList,
   Pressable,
@@ -11,6 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import * as Location from 'expo-location';
 
 import { SearchBar } from '@/components/ui/search-bar';
 import { VenueListItem } from '@/components/ui/venue-list-item';
@@ -21,6 +22,7 @@ import { FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
 import { useVenues } from '@/hooks/use-venues';
+import { getVenuesByMode } from '@/data';
 import type { Venue } from '@/types';
 
 // Full 24h time slots, every 30 minutes
@@ -29,7 +31,17 @@ for (let h = 0; h < 24; h++) {
   TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:00`);
   TIME_OPTIONS.push(`${h.toString().padStart(2, '0')}:30`);
 }
-const DISTRICT_OPTIONS = ['HCM', 'D1', 'D2', 'D3', 'D7', 'Thao Dien', 'Binh Thanh'];
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 export default function SearchScreen() {
   const { mode } = useAppMode();
@@ -40,8 +52,41 @@ export default function SearchScreen() {
   const [guests, setGuests] = useState(2);
   const [guestInput, setGuestInput] = useState('2');
   const [time, setTime] = useState('19:00');
-  const [district, setDistrict] = useState('HCM');
+  const [district, setDistrict] = useState(strings.home.allDistricts);
   const [openDropdown, setOpenDropdown] = useState<'guests' | 'time' | 'district' | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Get user location
+  useEffect(() => {
+    (async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+      const loc = await Location.getCurrentPositionAsync({});
+      setUserLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
+    })();
+  }, []);
+
+  // Build district options from real venue data, sorted by proximity to user
+  const allVenues = useMemo(() => getVenuesByMode(mode), [mode]);
+
+  const districtOptions = useMemo(() => {
+    // Extract unique districts from venue data
+    const uniqueDistricts = [...new Set(allVenues.map((v) => v.district))];
+
+    if (!userLocation) return [strings.home.allDistricts, ...uniqueDistricts.sort()];
+
+    // Calculate average distance to each district's venues
+    const withDistance = uniqueDistricts.map((d) => {
+      const districtVenues = allVenues.filter((v) => v.district === d);
+      const avgLat = districtVenues.reduce((s, v) => s + v.coordinates.latitude, 0) / districtVenues.length;
+      const avgLng = districtVenues.reduce((s, v) => s + v.coordinates.longitude, 0) / districtVenues.length;
+      const dist = haversineKm(userLocation.latitude, userLocation.longitude, avgLat, avgLng);
+      return { name: d, dist };
+    });
+
+    withDistance.sort((a, b) => a.dist - b.dist);
+    return [strings.home.allDistricts, ...withDistance.map((d) => d.name)];
+  }, [allVenues, userLocation, strings.home.allDistricts]);
 
   const handleGuestInputChange = (text: string) => {
     const digits = text.replace(/[^0-9]/g, '');
@@ -59,7 +104,8 @@ export default function SearchScreen() {
     setOpenDropdown(null);
   };
 
-  const venues = useVenues({ mode, searchQuery });
+  const districtFilter = district !== strings.home.allDistricts ? district : undefined;
+  const venues = useVenues({ mode, searchQuery, districtFilter });
 
   const toggleDropdown = (type: 'guests' | 'time' | 'district') => {
     if (type === 'guests') setGuestInput(String(guests));
@@ -125,22 +171,39 @@ export default function SearchScreen() {
             style={[
               styles.chip,
               {
-                backgroundColor: openDropdown === 'district' ? colors.primary : 'transparent',
-                borderColor: openDropdown === 'district' ? colors.primary : colors.border,
+                backgroundColor: district !== strings.home.allDistricts || openDropdown === 'district'
+                  ? colors.primary : 'transparent',
+                borderColor: district !== strings.home.allDistricts || openDropdown === 'district'
+                  ? colors.primary : colors.border,
               },
             ]}>
             <MaterialIcons
               name="place"
               size={16}
-              color={openDropdown === 'district' ? colors.primaryForeground : colors.textSecondary}
+              color={district !== strings.home.allDistricts || openDropdown === 'district'
+                ? colors.primaryForeground : colors.textSecondary}
             />
             <Text
               style={[
                 styles.chipText,
-                { color: openDropdown === 'district' ? colors.primaryForeground : colors.text },
+                { color: district !== strings.home.allDistricts || openDropdown === 'district'
+                  ? colors.primaryForeground : colors.text },
               ]}>
               {district}
             </Text>
+          </Pressable>
+
+          {/* Map view button */}
+          <Pressable
+            onPress={() => {
+              setOpenDropdown(null);
+              router.push('/nearby-map');
+            }}
+            style={[
+              styles.iconChip,
+              { backgroundColor: colors.primary, borderColor: colors.primary },
+            ]}>
+            <MaterialIcons name="map" size={18} color={colors.primaryForeground} />
           </Pressable>
 
           {/* Filter tune button */}
@@ -222,7 +285,7 @@ export default function SearchScreen() {
       {openDropdown === 'district' && (
         <View style={[styles.dropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dropdownScroll}>
-            {DISTRICT_OPTIONS.map((d) => (
+            {districtOptions.map((d) => (
               <Pressable
                 key={d}
                 onPress={() => { setDistrict(d); setOpenDropdown(null); }}

@@ -78,12 +78,22 @@ export default function HomeScreen() {
         />
 
         <View style={styles.searchWrap}>
-          <SearchBar
-            value=""
-            onChangeText={() => {}}
-            placeholder={searchPlaceholder}
-            onFocus={() => router.push('/(tabs)/search')}
-          />
+          <View style={styles.searchRow}>
+            <View style={{ flex: 1 }}>
+              <SearchBar
+                value=""
+                onChangeText={() => {}}
+                placeholder={searchPlaceholder}
+                onFocus={() => router.push('/(tabs)/search')}
+              />
+            </View>
+            <Pressable
+              style={[styles.mapButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push('/nearby-map')}
+            >
+              <MaterialIcons name="map" size={20} color={colors.primaryForeground} />
+            </Pressable>
+          </View>
         </View>
 
         <CategoryTabs selected={category} onSelect={handleCategoryChange} />
@@ -140,6 +150,18 @@ const styles = StyleSheet.create({
   searchWrap: {
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.md,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  mapButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   nearYouList: {
     paddingHorizontal: Spacing.md,

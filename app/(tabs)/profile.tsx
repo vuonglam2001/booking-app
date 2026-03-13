@@ -22,6 +22,7 @@ import { useAppMode } from '@/hooks/use-app-mode';
 import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { useBookings } from '@/hooks/use-bookings';
+import { useFavorites } from '@/hooks/use-favorites';
 
 export default function ProfileScreen() {
   const { mode } = useAppMode();
@@ -29,13 +30,14 @@ export default function ProfileScreen() {
   const { language, setLanguage, strings } = useLanguage();
   const { isAuthenticated, user, logout } = useAuth();
   const { reservations } = useBookings();
+  const { favoriteIds } = useFavorites();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
 
   const languageOptions: Language[] = ['en', 'vi'];
 
   const bookingsCount = reservations.length;
-  const favoritesCount = 5;
+  const favoritesCount = favoriteIds.length;
   const reviewsCount = 8;
 
   const getInitials = (name: string) => {
@@ -48,9 +50,9 @@ export default function ProfileScreen() {
   };
 
   const stats = [
-    { label: 'Bookings', value: bookingsCount },
-    { label: 'Favorites', value: favoritesCount },
-    { label: 'Reviews', value: reviewsCount },
+    { label: strings.profile.bookings, value: bookingsCount, onPress: () => router.push('/(tabs)/bookings') },
+    { label: strings.profile.favorites, value: favoritesCount, onPress: () => router.push('/favorites') },
+    { label: strings.profile.reviews, value: reviewsCount, onPress: undefined as (() => void) | undefined },
   ];
 
   return (
@@ -98,8 +100,9 @@ export default function ProfileScreen() {
             {/* Stats Row */}
             <View style={styles.statsRow}>
               {stats.map((stat) => (
-                <View
+                <Pressable
                   key={stat.label}
+                  onPress={stat.onPress}
                   style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                   <Text style={[styles.statValue, { color: colors.primary }]}>
                     {stat.value}
@@ -107,7 +110,7 @@ export default function ProfileScreen() {
                   <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
                     {stat.label}
                   </Text>
-                </View>
+                </Pressable>
               ))}
             </View>
           </>
@@ -118,7 +121,7 @@ export default function ProfileScreen() {
           {/* Saved Venues */}
           <Pressable
             style={[styles.menuItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}
-            onPress={() => {}}>
+            onPress={() => router.push('/favorites')}>
             <View style={styles.menuLeft}>
               <MaterialIcons name="favorite-border" size={22} color={colors.textSecondary} />
               <Text style={[Typography.body, { color: colors.text, marginLeft: Spacing.md }]}>
@@ -142,6 +145,7 @@ export default function ProfileScreen() {
               onValueChange={setNotificationsEnabled}
               trackColor={{ false: colors.border, true: colors.primary + '80' }}
               thumbColor={notificationsEnabled ? colors.primary : colors.textTertiary}
+              style={{ transform: [{ scale: 0.85 }] }}
             />
           </Pressable>
 
@@ -308,7 +312,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: Spacing.md,
+    height: 56,
     paddingHorizontal: Spacing.md,
   },
   menuLeft: {

@@ -75,6 +75,9 @@ export type Strings = {
     about: string;
     savedVenues: string;
     accountSettings: string;
+    bookings: string;
+    favorites: string;
+    reviews: string;
   };
   auth: {
     title: string;
@@ -86,11 +89,25 @@ export type Strings = {
     sentTo: string;
   };
   filters: {
+    title: string;
     cuisine: string;
     music: string;
     price: string;
+    pricePerPerson: string;
     rating: string;
     all: string;
+    numberOfGuests: string;
+    kidFriendly: string;
+    arrivalTime: string;
+    area: string;
+    city: string;
+    district: string;
+    allDistricts: string;
+    allAreas: string;
+    clearAll: string;
+    viewResults: string;
+    min: string;
+    max: string;
   };
   bookingDetail: {
     title: string;
@@ -211,6 +228,9 @@ const en: Strings = {
     about: 'About Spotly',
     savedVenues: 'Saved Venues',
     accountSettings: 'Account Settings',
+    bookings: 'Bookings',
+    favorites: 'Favorites',
+    reviews: 'Reviews',
   },
   auth: {
     title: 'Sign in to continue',
@@ -222,11 +242,25 @@ const en: Strings = {
     sentTo: 'Sent to',
   },
   filters: {
+    title: 'Filters',
     cuisine: 'Cuisine',
     music: 'Music',
-    price: 'Price',
+    price: 'Price Range',
+    pricePerPerson: 'Cost per person (VND)',
     rating: 'Rating',
     all: 'All',
+    numberOfGuests: 'Number of guests?',
+    kidFriendly: 'Kid-friendly restaurants',
+    arrivalTime: 'Arrival time?',
+    area: 'Area?',
+    city: 'City',
+    district: 'District',
+    allDistricts: 'All Districts',
+    allAreas: 'All areas',
+    clearAll: 'Clear all',
+    viewResults: 'View results',
+    min: 'Min',
+    max: 'Max',
   },
   bookingDetail: {
     title: 'Booking Details',
@@ -340,6 +374,9 @@ const vi: Strings = {
     about: 'Về Spotly',
     savedVenues: 'Địa điểm đã lưu',
     accountSettings: 'Cài đặt tài khoản',
+    bookings: 'Đặt chỗ',
+    favorites: 'Yêu thích',
+    reviews: 'Đánh giá',
   },
   auth: {
     title: 'Đăng nhập để tiếp tục',
@@ -351,11 +388,25 @@ const vi: Strings = {
     sentTo: 'Đã gửi đến',
   },
   filters: {
+    title: 'Bộ lọc',
     cuisine: 'Ẩm thực',
     music: 'Âm nhạc',
-    price: 'Giá',
+    price: 'Khoảng giá',
+    pricePerPerson: 'Chi phí mỗi người (VND)',
     rating: 'Đánh giá',
     all: 'Tất cả',
+    numberOfGuests: 'Số lượng khách?',
+    kidFriendly: 'Nhà hàng thân thiện trẻ em',
+    arrivalTime: 'Giờ đến?',
+    area: 'Khu vực?',
+    city: 'Thành phố',
+    district: 'Quận',
+    allDistricts: 'Tất cả quận',
+    allAreas: 'Tất cả khu vực',
+    clearAll: 'Xóa tất cả',
+    viewResults: 'Xem kết quả',
+    min: 'Tối thiểu',
+    max: 'Tối đa',
   },
   bookingDetail: {
     title: 'Chi tiết đặt chỗ',

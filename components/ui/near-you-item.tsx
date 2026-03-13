@@ -6,6 +6,7 @@ import { ThemeColors } from '@/constants/theme';
 import { Spacing } from '@/constants/spacing';
 import { FontFamily } from '@/constants/typography';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { useFavorites } from '@/hooks/use-favorites';
 import { formatPriceRange } from '@/utils/format';
 import type { Venue } from '@/types';
 
@@ -17,6 +18,8 @@ interface NearYouItemProps {
 export function NearYouItem({ venue, onPress }: NearYouItemProps) {
   const { mode } = useAppMode();
   const colors = ThemeColors[mode];
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorited = isFavorite(venue.id);
 
   const cuisineLabel = venue.cuisineTypes?.[0]
     ?? venue.musicTypes?.[0]
@@ -53,6 +56,16 @@ export function NearYouItem({ venue, onPress }: NearYouItemProps) {
           </Text>
         </View>
       </View>
+      <Pressable
+        onPress={(e) => { e.stopPropagation(); toggleFavorite(venue.id); }}
+        style={styles.heartBtn}
+        hitSlop={8}>
+        <MaterialIcons
+          name={favorited ? 'favorite' : 'favorite-border'}
+          size={20}
+          color={favorited ? '#EF4444' : colors.textTertiary}
+        />
+      </Pressable>
     </Pressable>
   );
 }
@@ -95,5 +108,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.monoMedium,
     fontSize: 13,
     lineHeight: 18,
+  },
+  heartBtn: {
+    padding: Spacing.xs,
   },
 });
