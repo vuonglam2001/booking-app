@@ -28,7 +28,7 @@ export function SearchBar({
   return (
     <View style={[styles.container, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
       <MaterialIcons
-        name="auto-awesome"
+        name="search"
         size={18}
         color={colors.primary}
         style={styles.icon}

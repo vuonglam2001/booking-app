@@ -315,34 +315,34 @@ export default function SearchScreen() {
               </Pressable>
             </View>
 
-            {/* Peak hours section */}
-            <Text style={[styles.modalSectionLabel, { color: colors.textSecondary }]}>
-              {mode === 'dining' ? 'Peak Hours' : 'Popular Hours'}
-            </Text>
-            <View style={styles.modalTimeGrid}>
-              {peakHours.map((t) => (
-                <Pressable
-                  key={`peak-${t}`}
-                  onPress={() => { setTime(t); setShowTimeModal(false); }}
-                  style={[
-                    styles.modalTimeItem,
-                    {
-                      backgroundColor: t === time ? colors.primary : 'transparent',
-                      borderColor: t === time ? colors.primary : colors.border,
-                    },
-                  ]}>
-                  <Text style={[styles.modalTimeText, { color: t === time ? colors.primaryForeground : colors.text }]}>
-                    {t}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* Peak hours section */}
+              <Text style={[styles.modalSectionLabel, { color: colors.textSecondary }]}>
+                {mode === 'dining' ? 'Peak Hours' : 'Popular Hours'}
+              </Text>
+              <View style={styles.modalTimeGrid}>
+                {peakHours.map((t) => (
+                  <Pressable
+                    key={`peak-${t}`}
+                    onPress={() => { setTime(t); setShowTimeModal(false); }}
+                    style={[
+                      styles.modalTimeItem,
+                      {
+                        backgroundColor: t === time ? colors.primary : 'transparent',
+                        borderColor: t === time ? colors.primary : colors.border,
+                      },
+                    ]}>
+                    <Text style={[styles.modalTimeText, { color: t === time ? colors.primaryForeground : colors.text }]}>
+                      {t}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
 
-            {/* All times section */}
-            <Text style={[styles.modalSectionLabel, { color: colors.textSecondary, marginTop: Spacing.md }]}>
-              All Times
-            </Text>
-            <ScrollView style={styles.modalScrollArea} showsVerticalScrollIndicator={false}>
+              {/* All times section */}
+              <Text style={[styles.modalSectionLabel, { color: colors.textSecondary, marginTop: Spacing.md }]}>
+                All Times
+              </Text>
               <View style={styles.modalTimeGrid}>
                 {ALL_TIME_OPTIONS.map((t) => (
                   <Pressable
@@ -541,9 +541,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing.sm,
-  },
-  modalScrollArea: {
-    flex: 1,
   },
   modalTimeItem: {
     paddingVertical: Spacing.sm + 2,

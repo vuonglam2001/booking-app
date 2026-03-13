@@ -418,7 +418,7 @@ export default function FilterScreen() {
             {strings.filters.pricePerPerson}
           </Text>
           <View style={styles.priceRow}>
-            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
+            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: colors.inputBackground }]}>
               <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>{strings.filters.min}</Text>
               <TextInput
                 style={[styles.priceValue, { color: colors.text }]}
@@ -431,7 +431,7 @@ export default function FilterScreen() {
               <Text style={[styles.priceSuffix, { color: colors.primary }]}>₫</Text>
             </View>
             <Text style={[Typography.body, { color: colors.textTertiary }]}>—</Text>
-            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: '#FFFFFF' }]}>
+            <View style={[styles.priceInput, { borderColor: colors.border, backgroundColor: colors.inputBackground }]}>
               <Text style={[styles.priceLabel, { color: colors.textTertiary }]}>{strings.filters.max}</Text>
               <TextInput
                 style={[styles.priceValue, { color: colors.text }]}
