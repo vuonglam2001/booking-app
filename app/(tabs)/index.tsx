@@ -1,98 +1,192 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import { HomeHeader } from '@/components/ui/home-header';
+import { SearchBar } from '@/components/ui/search-bar';
+import { BookingFilterBar } from '@/components/ui/booking-filter-bar';
+import { CategoryTabs, type CategoryKey } from '@/components/ui/category-tabs';
+import { SectionHeader } from '@/components/ui/section-header';
+import { TrendingCard } from '@/components/ui/trending-card';
+import { NearYouItem } from '@/components/ui/near-you-item';
+import { Carousel } from '@/components/ui/carousel';
+import { ThemeColors } from '@/constants/theme';
+import { Spacing } from '@/constants/spacing';
+import { useAppMode } from '@/hooks/use-app-mode';
+import { useLanguage } from '@/hooks/use-language';
+import { useNotifications } from '@/hooks/use-notifications';
+import { getVenuesByMode } from '@/data';
+import type { Venue } from '@/types';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { mode, setMode } = useAppMode();
+  const { strings } = useLanguage();
+  const { unreadCount } = useNotifications();
+  const colors = ThemeColors[mode];
+  const [category, setCategory] = useState<CategoryKey>(
+    mode === 'nightlife' ? 'nightlife' : 'dining'
+  );
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const handleCategoryChange = (key: CategoryKey) => {
+    setCategory(key);
+    // Switch app mode when selecting dining vs nightlife
+    if (key === 'dining') {
+      setMode('dining');
+    } else {
+      setMode('nightlife');
+    }
+  };
+
+  const venues = useMemo(() => getVenuesByMode(mode), [mode]);
+
+  const filteredVenues = useMemo(() => venues, [venues]);
+
+  const trending = useMemo(
+    () => [...filteredVenues].sort((a, b) => b.bookingCount - a.bookingCount).slice(0, 8),
+    [filteredVenues]
+  );
+
+  const nearYou = useMemo(
+    () => [...filteredVenues].sort((a, b) => a.id.localeCompare(b.id)).slice(0, 5),
+    [filteredVenues]
+  );
+
+  const searchPlaceholder =
+    mode === 'nightlife'
+      ? strings.home.searchPlaceholderNightlife
+      : strings.home.searchPlaceholder;
+
+  const trendingTitle =
+    mode === 'nightlife' ? strings.home.trendingNightlife : strings.home.trending;
+
+  const renderTrendingCard = (item: Venue) => (
+    <TrendingCard
+      venue={item}
+      onPress={() => router.push({ pathname: '/venue/[id]', params: { id: item.id } })}
+    />
+  );
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+
+        <HomeHeader
+          onNotificationPress={() => router.push('/notifications')}
+          onAvatarPress={() => router.push('/(tabs)/profile')}
+          unreadCount={unreadCount}
+        />
+
+        <View style={styles.searchWrap}>
+          <View style={styles.searchRow}>
+            <View style={{ flex: 1 }}>
+              <SearchBar
+                value=""
+                onChangeText={() => {}}
+                placeholder={searchPlaceholder}
+                onFocus={() => router.push('/(tabs)/search')}
+              />
+            </View>
+            <Pressable
+              style={[styles.mapButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push('/nearby-map')}
+            >
+              <MaterialIcons name="map" size={20} color={colors.primaryForeground} />
+            </Pressable>
+          </View>
+        </View>
+
+        <CategoryTabs selected={category} onSelect={handleCategoryChange} />
+
+        <BookingFilterBar
+          onSearch={() => router.push('/(tabs)/search')}
+          onFilter={() => router.push('/filter')}
+        />
+
+        <SectionHeader
+          title={trendingTitle}
+          onSeeAll={() => router.push('/(tabs)/search')}
+        />
+        <Carousel
+          data={trending}
+          renderItem={renderTrendingCard}
+          keyExtractor={(item) => item.id}
+        />
+
+        <SectionHeader
+          title={strings.home.nearYou}
+          onSeeAll={() => router.push('/(tabs)/search')}
+        />
+        <View style={styles.nearYouList}>
+          {nearYou.map((venue) => (
+            <NearYouItem
+              key={venue.id}
+              venue={venue}
+              onPress={() => router.push({ pathname: '/venue/[id]', params: { id: venue.id } })}
+            />
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* AI Assistant FAB */}
+      <Pressable
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+        onPress={() => router.push('/ai-assistant')}>
+        <MaterialIcons name="auto-awesome" size={22} color={colors.primaryForeground} />
+        <Text style={[styles.fabText, { color: colors.primaryForeground }]}>AI</Text>
+      </Pressable>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingTop: Spacing.md,
+    paddingBottom: Spacing.xxl,
+  },
+  searchWrap: {
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.sm,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  mapButton: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  nearYouList: {
+    paddingHorizontal: Spacing.md,
+  },
+  fab: {
     position: 'absolute',
+    bottom: Spacing.lg,
+    right: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: Spacing.md + 2,
+    paddingVertical: Spacing.sm + 4,
+    borderRadius: 28,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  fabText: {
+    fontFamily: 'Geist-SemiBold',
+    fontSize: 14,
   },
 });
